@@ -5,6 +5,7 @@ import Order from '../models/Order.model';
 import Product from '../models/Product.model';
 import Cart from '../models/Cart.model';
 import Coupon from '../models/Coupon.model';
+import Notification from '../models/Notification.model';
 import { AppError } from '../utils/AppError';
 import catchAsync from '../utils/catchAsync';
 import { env } from '../config/env';
@@ -123,6 +124,14 @@ export const stripeWebhook = async (req: Request, res: Response): Promise<void> 
           );
         }
 
+        // Create an order success notification
+        await Notification.create({
+          userId: order.userId,
+          title: 'Order Payment Successful',
+          body: `Your payment for order ${order._id} was successful and is now being processed.`,
+          type: 'order_status',
+        });
+
         console.log(`✅ Order ${order._id} successfully marked as PAID. Stock updated, Cart cleared, and Coupon count incremented.`);
       }
       break;
@@ -134,6 +143,15 @@ export const stripeWebhook = async (req: Request, res: Response): Promise<void> 
       if (failedOrder) {
         failedOrder.paymentStatus = 'failed';
         await failedOrder.save();
+        
+        // Create an order failure notification
+        await Notification.create({
+          userId: failedOrder.userId,
+          title: 'Order Payment Failed',
+          body: `Your payment for order ${failedOrder._id} failed. Please try again.`,
+          type: 'order_status',
+        });
+
         console.log(`❌ Order ${failedOrder._id} payment failed.`);
       }
       break;
