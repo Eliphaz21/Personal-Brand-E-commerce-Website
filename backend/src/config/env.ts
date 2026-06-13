@@ -38,7 +38,7 @@ const envSchema = z.object({
   CLIENT_URL: z.string().default('http://localhost:5173'),
 
   // AI (Phase 16 - optional at startup)
-  OPENAI_API_KEY: z.string().optional(),
+  GEMINI_API_KEY: z.string().optional(),
   CHROMA_URL: z.string().optional(),
 });
 
