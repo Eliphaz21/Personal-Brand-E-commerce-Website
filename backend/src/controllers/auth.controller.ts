@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import User from '../models/User.model';
 import { AppError } from '../utils/AppError';
@@ -123,7 +123,7 @@ export const verifyOTP = catchAsync(async (req: Request, res: Response): Promise
   user.otpResendCount = 0;
 
   // Generate session tokens
-  const tokenPayload: TokenPayload = { userId: user._id as string, role: user.role };
+  const tokenPayload: TokenPayload = { userId: user._id.toString(), role: user.role };
   const accessToken = generateAccessToken(tokenPayload);
   const refreshToken = generateRefreshToken(tokenPayload);
 
@@ -226,7 +226,7 @@ export const login = catchAsync(async (req: Request, res: Response): Promise<voi
   }
 
   // Generate tokens
-  const tokenPayload: TokenPayload = { userId: user._id as string, role: user.role };
+  const tokenPayload: TokenPayload = { userId: user._id.toString(), role: user.role };
   const accessToken = generateAccessToken(tokenPayload);
   const refreshToken = generateRefreshToken(tokenPayload);
 
@@ -277,7 +277,7 @@ export const refreshToken = catchAsync(async (req: Request, res: Response): Prom
     }
 
     // Generate new tokens (rotation)
-    const tokenPayload: TokenPayload = { userId: user._id as string, role: user.role };
+    const tokenPayload: TokenPayload = { userId: user._id.toString(), role: user.role };
     const newAccessToken = generateAccessToken(tokenPayload);
     const newRefreshToken = generateRefreshToken(tokenPayload);
 

@@ -129,7 +129,7 @@ export const getOrderById = catchAsync(async (req: Request, res: Response): Prom
  * @route   GET /api/orders
  * @access  Private/Admin
  */
-export const getAllOrders = catchAsync(async (req: Request, res: Response): Promise<void> => {
+export const getAllOrders = catchAsync(async (_req: Request, res: Response): Promise<void> => {
   const orders = await Order.find().populate('userId', 'name email').sort({ createdAt: -1 });
 
   res.status(200).json({
