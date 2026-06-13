@@ -11,13 +11,14 @@ import { globalErrorHandler, notFoundHandler } from './middlewares/error.middlew
 
 // Route imports (will be wired as each phase is built)
 import authRoutes from './routes/auth.routes';
-// import userRoutes from './routes/user.routes';
+import userRoutes from './routes/user.routes';
 import productRoutes from './routes/product.routes';
 import cartRoutes from './routes/cart.routes';
 import wishlistRoutes from './routes/wishlist.routes';
-// import orderRoutes from './routes/order.routes';
+import orderRoutes from './routes/order.routes';
+import paymentRoutes from './routes/payment.routes';
+import { stripeWebhook } from './controllers/payment.controller';
 // import reviewRoutes from './routes/review.routes';
-// import paymentRoutes from './routes/payment.routes';
 // import messageRoutes from './routes/message.routes';
 // import couponRoutes from './routes/coupon.routes';
 // import notificationRoutes from './routes/notification.routes';
@@ -48,7 +49,15 @@ app.use(mongoSanitize());
 
 // ─── General Middleware ───────────────────────────────────────────────────────
 
-// Parse JSON body (note: Stripe webhook uses raw body — handled separately in payment routes)
+// ⚠️ IMPORTANT: Stripe webhook MUST be registered BEFORE express.json() middleware
+// because Stripe signature verification requires the raw, unparsed request body.
+app.post(
+  '/api/payments/webhook',
+  express.raw({ type: 'application/json' }),
+  stripeWebhook
+);
+
+// Parse JSON body for all other routes
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
@@ -77,13 +86,13 @@ app.get('/api/health', (_req, res) => {
 
 // ─── API Routes (wired per phase) ─────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
-// app.use('/api/users', userRoutes);
+app.use('/api/users', userRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/wishlist', wishlistRoutes);
-// app.use('/api/orders', orderRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/payments', paymentRoutes);
 // app.use('/api/reviews', reviewRoutes);
-// app.use('/api/payments', paymentRoutes);
 // app.use('/api/messages', messageRoutes);
 // app.use('/api/coupons', couponRoutes);
 // app.use('/api/notifications', notificationRoutes);

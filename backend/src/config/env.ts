@@ -32,7 +32,7 @@ const envSchema = z.object({
 
   // Stripe
   STRIPE_SECRET_KEY: z.string().min(1, 'STRIPE_SECRET_KEY is required'),
-  STRIPE_WEBHOOK_SECRET: z.string().min(1, 'STRIPE_WEBHOOK_SECRET is required'),
+  STRIPE_WEBHOOK_SECRET: z.string().optional(), // Configure when setting up Stripe webhooks
 
   // Frontend
   CLIENT_URL: z.string().default('http://localhost:5173'),
