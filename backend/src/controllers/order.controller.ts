@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import Order, { IOrderItem } from '../models/Order.model';
 import Product from '../models/Product.model';
+import Coupon from '../models/Coupon.model';
 import { AppError } from '../utils/AppError';
 import catchAsync from '../utils/catchAsync';
 
@@ -47,10 +48,45 @@ export const createOrder = catchAsync(async (req: Request, res: Response): Promi
     });
   }
 
-  const tax = subtotal * 0.05; // 5% tax example
+  // Handle coupon validation and discount calculation
+  let discount = 0;
+  let validatedCouponCode = '';
+
+  if (couponCode) {
+    const coupon = await Coupon.findOne({ code: couponCode.toUpperCase() });
+    if (!coupon) {
+      throw new AppError('Invalid coupon code.', 404);
+    }
+    if (!coupon.isActive) {
+      throw new AppError('This coupon is currently inactive.', 400);
+    }
+    if (coupon.expiresAt && new Date() > coupon.expiresAt) {
+      throw new AppError('This coupon has expired.', 400);
+    }
+    if (coupon.maxUsageCount > 0 && coupon.usedCount >= coupon.maxUsageCount) {
+      throw new AppError('This coupon usage limit has been reached.', 400);
+    }
+    if (coupon.minimumOrderAmount > 0 && subtotal < coupon.minimumOrderAmount) {
+      throw new AppError(`This coupon requires a minimum spend of $${coupon.minimumOrderAmount}.`, 400);
+    }
+
+    if (coupon.discountType === 'percentage') {
+      discount = subtotal * (coupon.discountValue / 100);
+    } else {
+      discount = coupon.discountValue;
+    }
+
+    if (discount > subtotal) {
+      discount = subtotal; // discount cannot exceed subtotal
+    }
+
+    discount = Math.round(discount * 100) / 100;
+    validatedCouponCode = coupon.code;
+  }
+
+  const tax = Math.round((subtotal * 0.05) * 100) / 100; // 5% tax example
   const shippingCost = subtotal > 100 ? 0 : 10; // Free shipping over $100
-  const discount = 0; // Future coupon logic
-  const totalPrice = subtotal + tax + shippingCost - discount;
+  const totalPrice = Math.round((subtotal + tax + shippingCost - discount) * 100) / 100;
 
   const order = await Order.create({
     userId,
@@ -60,7 +96,7 @@ export const createOrder = catchAsync(async (req: Request, res: Response): Promi
     tax,
     shippingCost,
     discount,
-    couponCode,
+    couponCode: validatedCouponCode,
     totalPrice,
     notes,
     paymentStatus: 'pending',

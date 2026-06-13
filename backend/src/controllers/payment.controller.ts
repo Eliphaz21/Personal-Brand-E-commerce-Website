@@ -4,6 +4,7 @@ import stripe from '../config/stripe';
 import Order from '../models/Order.model';
 import Product from '../models/Product.model';
 import Cart from '../models/Cart.model';
+import Coupon from '../models/Coupon.model';
 import { AppError } from '../utils/AppError';
 import catchAsync from '../utils/catchAsync';
 import { env } from '../config/env';
@@ -114,7 +115,15 @@ export const stripeWebhook = async (req: Request, res: Response): Promise<void> 
           { $set: { items: [], totalAmount: 0 } }
         );
 
-        console.log(`✅ Order ${order._id} successfully marked as PAID. Stock updated and Cart cleared.`);
+        // Increment coupon used count if a coupon was used
+        if (order.couponCode) {
+          await Coupon.findOneAndUpdate(
+            { code: order.couponCode },
+            { $inc: { usedCount: 1 } }
+          );
+        }
+
+        console.log(`✅ Order ${order._id} successfully marked as PAID. Stock updated, Cart cleared, and Coupon count incremented.`);
       }
       break;
     }
