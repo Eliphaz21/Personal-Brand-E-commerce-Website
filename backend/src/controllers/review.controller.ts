@@ -154,8 +154,9 @@ export const deleteReview = catchAsync(async (req: Request, res: Response): Prom
     throw new AppError('You do not have permission to delete this review.', 403);
   }
 
-  // Must call deleteOne on document to trigger the post delete hook
-  await review.deleteOne();
+  // Use findOneAndDelete so the post('findOneAndDelete') hook fires and
+  // recalculates the product's average rating.
+  await Review.findOneAndDelete({ _id: req.params.id });
 
   res.status(200).json({
     success: true,

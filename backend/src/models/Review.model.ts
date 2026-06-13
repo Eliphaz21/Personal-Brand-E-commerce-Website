@@ -72,8 +72,8 @@ reviewSchema.post('save', async function () {
   await updateProductRating(this.productId);
 });
 
-reviewSchema.post('deleteOne', { document: true }, async function () {
-  await updateProductRating(this.productId);
+reviewSchema.post('findOneAndDelete', async function (doc: IReview | null) {
+  if (doc) await updateProductRating(doc.productId);
 });
 
 async function updateProductRating(productId: mongoose.Types.ObjectId): Promise<void> {

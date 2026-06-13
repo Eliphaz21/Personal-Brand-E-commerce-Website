@@ -23,7 +23,7 @@ import messageRoutes from './routes/message.routes';
 import couponRoutes from './routes/coupon.routes';
 import notificationRoutes from './routes/notification.routes';
 // import adminRoutes from './routes/admin.routes';
-// import analyticsRoutes from './routes/analytics.routes';
+import analyticsRoutes from './routes/analytics.routes';
 // import aiRoutes from './routes/ai.routes';
 
 const app: Application = express();
@@ -97,7 +97,7 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/coupons', couponRoutes);
 app.use('/api/notifications', notificationRoutes);
 // app.use('/api/admin', adminRoutes);
-// app.use('/api/admin/analytics', analyticsRoutes);
+app.use('/api/admin/analytics', analyticsRoutes);
 // app.use('/api/ai', aiRoutes);
 
 // ─── Error Handling ───────────────────────────────────────────────────────────

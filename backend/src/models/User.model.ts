@@ -88,12 +88,13 @@ const userSchema = new Schema<IUser>(
     timestamps: true,
     toJSON: {
       transform: (_doc, ret) => {
-        delete ret.passwordHash;
-        delete ret.otp;
-        delete ret.otpExpiry;
-        delete ret.refreshToken;
-        delete ret.__v;
-        return ret;
+        const obj = ret as Record<string, unknown>;
+        delete obj.passwordHash;
+        delete obj.otp;
+        delete obj.otpExpiry;
+        delete obj.refreshToken;
+        delete obj.__v;
+        return obj;
       },
     },
   }
