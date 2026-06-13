@@ -167,3 +167,39 @@ export const sendPasswordResetEmail = async (email: string, name: string, otp: s
     html: getHtmlLayout(content),
   });
 };
+
+/**
+ * Send a reply to a user's contact message.
+ */
+export const sendContactReplyEmail = async (
+  email: string,
+  name: string,
+  subject: string,
+  replyBody: string,
+  originalMessage: string
+): Promise<void> => {
+  const content = `
+    <h2>Response to your message: "${subject}"</h2>
+    <p>Hello ${name},</p>
+    <p>Thank you for reaching out to us. An admin has reviewed your message and provided the following response:</p>
+    <div style="background-color: rgba(201, 159, 153, 0.1); padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #c99f99;">
+      <p style="margin: 0; white-space: pre-wrap;">${replyBody}</p>
+    </div>
+    
+    <p style="font-size: 14px; color: #a5975b; margin-top: 30px;"><strong>Your Original Message:</strong></p>
+    <div style="background-color: #f2efe1; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; border: 1px dashed #a5975b;">
+      <p style="margin: 0; white-space: pre-wrap;">${originalMessage}</p>
+    </div>
+    
+    <p>If you have any further questions, feel free to reply directly to this email or submit a new message through our contact form.</p>
+    <br>
+    <p>Warm regards,<br>The KidEnDu Team</p>
+  `;
+
+  await transporter.sendMail({
+    from: `"${env.EMAIL_FROM_NAME || 'KidEnDu'}" <${env.EMAIL_FROM}>`,
+    to: email,
+    subject: `Re: ${subject}`,
+    html: getHtmlLayout(content),
+  });
+};

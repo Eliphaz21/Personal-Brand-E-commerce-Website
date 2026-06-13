@@ -24,13 +24,16 @@ export const getUserNotifications = catchAsync(async (req: Request, res: Respons
   // Calculate unread count
   const unreadCount = await Notification.countDocuments({ userId, isRead: false });
 
-  sendSuccess(res, 200, {
-    notifications,
-    unreadCount,
-    total,
-    page,
-    pages: Math.ceil(total / limit),
-  }, 'Notifications fetched successfully');
+  sendSuccess(
+    res,
+    {
+      notifications,
+      unreadCount,
+    },
+    'Notifications fetched successfully',
+    200,
+    { page, totalPages: Math.ceil(total / limit), total }
+  );
 });
 
 export const markAsRead = catchAsync(async (req: Request, res: Response) => {
@@ -51,7 +54,7 @@ export const markAsRead = catchAsync(async (req: Request, res: Response) => {
     throw new AppError('Notification not found', 404);
   }
 
-  sendSuccess(res, 200, { notification }, 'Notification marked as read');
+  sendSuccess(res, { notification }, 'Notification marked as read', 200);
 });
 
 export const markAllAsRead = catchAsync(async (req: Request, res: Response) => {
@@ -63,5 +66,5 @@ export const markAllAsRead = catchAsync(async (req: Request, res: Response) => {
 
   await Notification.updateMany({ userId, isRead: false }, { isRead: true });
 
-  sendSuccess(res, 200, null, 'All notifications marked as read');
+  sendSuccess(res, null, 'All notifications marked as read', 200);
 });
