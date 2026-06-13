@@ -12,7 +12,7 @@ import { globalErrorHandler, notFoundHandler } from './middlewares/error.middlew
 // Route imports (will be wired as each phase is built)
 import authRoutes from './routes/auth.routes';
 // import userRoutes from './routes/user.routes';
-// import productRoutes from './routes/product.routes';
+import productRoutes from './routes/product.routes';
 // import cartRoutes from './routes/cart.routes';
 // import wishlistRoutes from './routes/wishlist.routes';
 // import orderRoutes from './routes/order.routes';
@@ -78,7 +78,7 @@ app.get('/api/health', (_req, res) => {
 // ─── API Routes (wired per phase) ─────────────────────────────────────────────
 app.use('/api/auth', authRoutes);
 // app.use('/api/users', userRoutes);
-// app.use('/api/products', productRoutes);
+app.use('/api/products', productRoutes);
 // app.use('/api/cart', cartRoutes);
 // app.use('/api/wishlist', wishlistRoutes);
 // app.use('/api/orders', orderRoutes);
