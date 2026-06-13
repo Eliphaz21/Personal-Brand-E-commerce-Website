@@ -10,7 +10,7 @@ import { apiLimiter } from './middlewares/rateLimiter.middleware';
 import { globalErrorHandler, notFoundHandler } from './middlewares/error.middleware';
 
 // Route imports (will be wired as each phase is built)
-// import authRoutes from './routes/auth.routes';
+import authRoutes from './routes/auth.routes';
 // import userRoutes from './routes/user.routes';
 // import productRoutes from './routes/product.routes';
 // import cartRoutes from './routes/cart.routes';
@@ -76,7 +76,7 @@ app.get('/api/health', (_req, res) => {
 });
 
 // ─── API Routes (wired per phase) ─────────────────────────────────────────────
-// app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes);
 // app.use('/api/users', userRoutes);
 // app.use('/api/products', productRoutes);
 // app.use('/api/cart', cartRoutes);
