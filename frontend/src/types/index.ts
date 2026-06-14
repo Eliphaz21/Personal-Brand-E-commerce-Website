@@ -39,6 +39,7 @@ export interface Product {
   lowStockThreshold?: number;
   weight?: number;
   sku?: string;
+  tags?: string[];
   createdAt: string;
 }
 
@@ -67,42 +68,41 @@ export interface Cart {
 }
 
 export interface OrderItem {
-  product: Product | string;
-  name: string;
+  productId: string | Product;
+  title: string;
   price: number;
-  quantity: number;
+  qty: number;
   image: string;
 }
 
 export interface ShippingAddress {
+  fullName?: string;
   address: string;
   city: string;
+  state?: string;
   postalCode: string;
   country: string;
+  phone?: string;
 }
 
 export interface Order {
   _id: string;
-  user: string | { _id: string; name: string; email: string };
-  orderItems: OrderItem[];
+  userId: string | { _id: string; name: string; email: string };
+  orderNumber?: string;
+  items: OrderItem[];
   shippingAddress: ShippingAddress;
-  paymentMethod: string;
-  paymentResult?: {
-    id: string;
-    status: string;
-    update_time: string;
-    email_address: string;
-  };
-  itemsPrice: number;
-  taxPrice: number;
-  shippingPrice: number;
+  subtotal: number;
+  tax: number;
+  shippingCost: number;
+  discount: number;
+  couponCode?: string;
   totalPrice: number;
-  isPaid: boolean;
-  paidAt?: string;
-  isDelivered: boolean;
-  deliveredAt?: string;
-  status: 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
+  paymentStatus: 'pending' | 'paid' | 'failed' | 'refunded';
+  orderStatus: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  stripePaymentIntentId?: string;
   trackingNumber?: string;
+  estimatedDelivery?: string;
+  notes?: string;
   createdAt: string;
 }
 

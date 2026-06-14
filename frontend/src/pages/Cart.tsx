@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../hooks/useCart';
-import { useAuth } from '../hooks/useAuth';
+
 import apiClient from '../services/apiClient';
 import { ShoppingBag, ArrowRight, Trash2, Plus, Minus, Tag, AlertCircle, CheckCircle, Loader } from 'lucide-react';
 
@@ -14,7 +14,7 @@ export const Cart: React.FC = () => {
     removeFromCart, 
     clearCart 
   } = useCart();
-  const { isAuthenticated } = useAuth();
+
   const navigate = useNavigate();
 
   // Coupon states
@@ -32,7 +32,7 @@ export const Cart: React.FC = () => {
   // Local updating status for individual items to prevent double-clicking
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
-  const handleQtyChange = async (productId: string, currentQty: number, newQty: number, maxStock: number) => {
+  const handleQtyChange = async (productId: string, _currentQty: number, newQty: number, maxStock: number) => {
     if (newQty < 1 || newQty > maxStock) return;
     setUpdatingId(productId);
     try {

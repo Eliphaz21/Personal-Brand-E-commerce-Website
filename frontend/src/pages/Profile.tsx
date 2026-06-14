@@ -97,20 +97,18 @@ export const Profile: React.FC = () => {
   const demoOrders: Order[] = [
     {
       _id: 'ord-demo-1',
-      user: user?.id as any || 'user-1',
-      orderItems: [
-        { product: 'mock-1', name: 'OvaBoost Max (Egg Quality Support)', price: 49.99, quantity: 1, image: 'https://images.unsplash.com/photo-1584017911766-d451b3d0e843?auto=format&fit=crop&q=80&w=200' }
+      userId: user?.id as any || 'user-1',
+      items: [
+        { productId: 'mock-1', title: 'OvaBoost Max (Egg Quality Support)', price: 49.99, qty: 1, image: 'https://images.unsplash.com/photo-1584017911766-d451b3d0e843?auto=format&fit=crop&q=80&w=200' }
       ],
       shippingAddress: { address: '123 Wellness Blvd', city: 'New York', postalCode: '10001', country: 'United States' },
-      paymentMethod: 'Stripe',
-      itemsPrice: 49.99,
-      taxPrice: 4.00,
-      shippingPrice: 0,
+      subtotal: 49.99,
+      tax: 4.00,
+      shippingCost: 0,
+      discount: 0,
       totalPrice: 53.99,
-      isPaid: true,
-      paidAt: new Date(Date.now() - 86400000 * 3).toISOString(),
-      isDelivered: false,
-      status: 'Processing',
+      paymentStatus: 'paid',
+      orderStatus: 'processing',
       createdAt: new Date(Date.now() - 86400000 * 3).toISOString()
     }
   ];
@@ -324,7 +322,7 @@ export const Profile: React.FC = () => {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
               {orders.map(order => {
-                const statusKey = order.status?.toLowerCase() || 'pending';
+                const statusKey = order.orderStatus?.toLowerCase() || 'pending';
                 const statusConfig = ORDER_STATUS_CONFIG[statusKey] || ORDER_STATUS_CONFIG.pending;
 
                 return (
@@ -363,19 +361,19 @@ export const Profile: React.FC = () => {
 
                     {/* Order Items */}
                     <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-                      {order.orderItems.map((item, idx) => (
+                      {order.items?.map((item, idx) => (
                         <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 0.75rem', borderRadius: '8px', backgroundColor: 'var(--color-bg-main)', border: '1px solid var(--color-border)', flex: '1 1 auto', minWidth: '200px', maxWidth: '360px' }}>
                           {item.image && (
                             <div style={{ width: '40px', height: '40px', borderRadius: '6px', overflow: 'hidden', flexShrink: 0 }}>
-                              <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                              <img src={item.image} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                             </div>
                           )}
                           <div style={{ minWidth: 0 }}>
                             <p style={{ margin: 0, fontSize: '0.8rem', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                              {item.name}
+                              {item.title}
                             </p>
                             <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-                              Qty: {item.quantity} · ${item.price.toFixed(2)} each
+                              Qty: {item.qty} · ${item.price.toFixed(2)} each
                             </p>
                           </div>
                         </div>
