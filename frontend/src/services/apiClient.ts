@@ -16,6 +16,13 @@ export const setClientAccessToken = (token: string) => {
   accessToken = token;
 };
 
+const getTokenFromResponse = (response: any) =>
+  response?.data?.data?.token ||
+  response?.data?.token ||
+  response?.data?.data?.accessToken ||
+  response?.data?.accessToken ||
+  null;
+
 // Request interceptor to attach JWT
 apiClient.interceptors.request.use(
   (config) => {
@@ -51,7 +58,7 @@ apiClient.interceptors.response.use(
         );
         
         // Extract token. In our backend sendSuccess structure, it is in response.data.data
-        const newToken = response.data?.data?.token || response.data?.token;
+        const newToken = getTokenFromResponse(response);
         const user = response.data?.data?.user || response.data?.user;
         
         if (newToken) {

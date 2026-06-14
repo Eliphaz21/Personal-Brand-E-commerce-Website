@@ -30,7 +30,7 @@ export const Register: React.FC = () => {
 
     setLoading(true);
     try {
-      await register(name, email, password);
+      await register(name, email, password, confirmPassword);
       // Redirect to OTP verification page passing the email along
       navigate('/verify-otp', { state: { email } });
     } catch (err: any) {

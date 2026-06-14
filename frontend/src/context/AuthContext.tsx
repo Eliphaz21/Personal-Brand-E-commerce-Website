@@ -7,7 +7,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   accessToken: string | null;
   isLoading: boolean;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  register: (name: string, email: string, password: string, confirmPassword: string) => Promise<void>;
   verifyOTP: (email: string, otp: string) => Promise<void>;
   resendOTP: (email: string) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
@@ -23,13 +23,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const getTokenFromResponse = (response: any) =>
+    response?.data?.data?.token ||
+    response?.data?.token ||
+    response?.data?.data?.accessToken ||
+    response?.data?.accessToken ||
+    null;
+
+  const getUserFromResponse = (response: any) =>
+    response?.data?.data?.user || response?.data?.user || null;
+
   // Initialize and check current auth session
   const checkAuth = async () => {
     try {
       // Hit refresh token endpoint on app load to auto login if valid cookie exists
       const response = await apiClient.post('/auth/refresh-token');
-      const token = response.data?.data?.token || response.data?.token;
-      const userData = response.data?.data?.user || response.data?.user;
+      const token = getTokenFromResponse(response);
+      const userData = getUserFromResponse(response);
       
       if (token && userData) {
         setAccessToken(token);
@@ -73,14 +83,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
-  const register = async (name: string, email: string, password: string) => {
-    await apiClient.post('/auth/register', { name, email, password });
+  const register = async (name: string, email: string, password: string, confirmPassword: string) => {
+    await apiClient.post('/auth/register', { name, email, password, confirmPassword });
   };
 
   const verifyOTP = async (email: string, otp: string) => {
     const response = await apiClient.post('/auth/verify-otp', { email, otp });
-    const token = response.data?.data?.token || response.data?.token;
-    const userData = response.data?.data?.user || response.data?.user;
+    const token = getTokenFromResponse(response);
+    const userData = getUserFromResponse(response);
     
     if (token && userData) {
       setAccessToken(token);
@@ -95,8 +105,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const login = async (email: string, password: string) => {
     const response = await apiClient.post('/auth/login', { email, password });
-    const token = response.data?.data?.token || response.data?.token;
-    const userData = response.data?.data?.user || response.data?.user;
+    const token = getTokenFromResponse(response);
+    const userData = getUserFromResponse(response);
     
     if (token && userData) {
       setAccessToken(token);
