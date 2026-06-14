@@ -8,7 +8,7 @@ import { Star, ShoppingCart, CheckCircle, ShieldAlert, ArrowLeft, Loader, Plus, 
 
 export const ProductDetails: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated } = useAuth();
   const { addToCart } = useCart();
   const navigate = useNavigate();
 
@@ -224,7 +224,7 @@ export const ProductDetails: React.FC = () => {
     setReviewSuccess('');
 
     try {
-      const res = await apiClient.post('/reviews', {
+      await apiClient.post('/reviews', {
         productId: product._id,
         rating: newRating,
         comment: newComment

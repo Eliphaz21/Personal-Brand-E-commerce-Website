@@ -138,6 +138,13 @@ export const Checkout: React.FC = () => {
 
     try {
       // In a production env, Stripe.js would confirm the payment intent with clientSecret here.
+      // e.g. await stripe.confirmCardPayment(clientSecret, { payment_method: ... })
+      if (clientSecret) {
+        console.log('Simulating payment confirmation using Stripe client secret:', clientSecret);
+      } else {
+        console.log('No client secret found, running in offline/simulate mode.');
+      }
+
       // The webhook then automatically marks the order as paid.
       // For demo: we simulate a 2-second processing delay and show confirmation.
       await new Promise(resolve => setTimeout(resolve, 2000));
