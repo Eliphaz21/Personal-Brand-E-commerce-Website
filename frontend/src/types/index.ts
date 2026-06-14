@@ -1,9 +1,11 @@
 export interface User {
+  _id?: string;
   id: string;
   name: string;
   email: string;
-  role: 'customer' | 'admin';
+  role: 'guest' | 'customer' | 'admin';
   avatar?: string;
+  bio?: string;
   isVerified: boolean;
   createdAt: string;
 }
