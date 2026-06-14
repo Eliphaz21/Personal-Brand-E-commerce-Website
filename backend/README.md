@@ -484,8 +484,9 @@ All endpoints are prefixed with `/api`.
 // Request Body
 {
   "name": "Kidist Alemu",
-  "email": "kidist@example.com",
-  "password": "SecurePassword123!"
+  "email": "[EMAIL_ADDRESS]",
+  "password": "SecurePassword123!",
+  "confirmPassword": "SecurePassword123!"
 }
 
 // Response 201
