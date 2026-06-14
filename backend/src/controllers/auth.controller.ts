@@ -137,6 +137,7 @@ export const verifyOTP = catchAsync(async (req: Request, res: Response): Promise
     success: true,
     message: 'Email verified successfully! You are now logged in.',
     accessToken,
+    token: accessToken,
     user: {
       id: user._id,
       name: user.name,
@@ -241,6 +242,7 @@ export const login = catchAsync(async (req: Request, res: Response): Promise<voi
     success: true,
     message: 'Logged in successfully.',
     accessToken,
+    token: accessToken,
     user: {
       id: user._id,
       name: user.name,
@@ -289,6 +291,7 @@ export const refreshToken = catchAsync(async (req: Request, res: Response): Prom
     res.status(200).json({
       success: true,
       accessToken: newAccessToken,
+      token: newAccessToken,
     });
   } catch (err) {
     throw new AppError('Invalid or expired refresh token.', 401);
