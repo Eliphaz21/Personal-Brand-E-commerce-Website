@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { ShieldAlert, RefreshCw, KeyRound, Loader, AlertCircle } from 'lucide-react';
+import { RefreshCw, KeyRound, Loader, AlertCircle } from 'lucide-react';
 
 export const VerifyOTP: React.FC = () => {
   const { verifyOTP, resendOTP } = useAuth();

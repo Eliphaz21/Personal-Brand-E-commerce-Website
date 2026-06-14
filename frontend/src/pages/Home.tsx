@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useCart } from '../hooks/useCart';
 import apiClient from '../services/apiClient';
 import type { Product } from '../types';
-import { Star, ArrowRight, Shield, Heart, Sparkles, Award, User, ShoppingCart, CheckCircle } from 'lucide-react';
+import { Star, ArrowRight, Heart, Sparkles, Award, User, ShoppingCart, CheckCircle } from 'lucide-react';
 
 export const Home: React.FC = () => {
   const { isAuthenticated } = useAuth();
