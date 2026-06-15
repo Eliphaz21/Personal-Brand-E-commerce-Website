@@ -100,8 +100,7 @@ const userSchema = new Schema<IUser>(
   }
 );
 
-// Index for fast email lookups
-userSchema.index({ email: 1 });
+// Index for fast lookups (email index is created automatically from unique: true constraint)
 userSchema.index({ createdAt: -1 });
 
 /**

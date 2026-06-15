@@ -45,7 +45,7 @@ const cartSchema = new Schema<ICart>(
   { timestamps: true }
 );
 
-cartSchema.index({ userId: 1 });
+// Index on userId is created automatically from unique: true constraint
 
 const Cart: Model<ICart> = mongoose.model<ICart>('Cart', cartSchema);
 export default Cart;

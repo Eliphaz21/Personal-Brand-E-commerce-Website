@@ -192,14 +192,13 @@ productSchema.virtual('isOnSale').get(function () {
   return this.compareAtPrice > 0 && this.compareAtPrice > this.price;
 });
 
-// Indexes for fast search, filter, sort
+// Indexes for fast search, filter, sort (slug index is created automatically from unique: true constraint)
 productSchema.index({ title: 'text', description: 'text', tags: 'text' });
 productSchema.index({ category: 1, isActive: 1 });
 productSchema.index({ price: 1 });
 productSchema.index({ rating: -1 });
 productSchema.index({ createdAt: -1 });
 productSchema.index({ isFeatured: 1, isActive: 1 });
-productSchema.index({ slug: 1 });
 
 const Product: Model<IProduct> = mongoose.model<IProduct>('Product', productSchema);
 export default Product;

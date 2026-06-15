@@ -62,7 +62,7 @@ const couponSchema = new Schema<ICoupon>(
   { timestamps: true }
 );
 
-couponSchema.index({ code: 1 });
+// Index on code is created automatically from unique: true constraint
 couponSchema.index({ isActive: 1, expiresAt: 1 });
 
 const Coupon: Model<ICoupon> = mongoose.model<ICoupon>('Coupon', couponSchema);

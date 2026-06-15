@@ -25,7 +25,7 @@ const wishlistSchema = new Schema<IWishlist>(
   { timestamps: true }
 );
 
-wishlistSchema.index({ userId: 1 });
+// Index on userId is created automatically from unique: true constraint
 
 const Wishlist: Model<IWishlist> = mongoose.model<IWishlist>('Wishlist', wishlistSchema);
 export default Wishlist;
