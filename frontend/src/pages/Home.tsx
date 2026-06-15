@@ -16,86 +16,6 @@ export const Home: React.FC = () => {
   const [addingId, setAddingId] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<{ [key: string]: boolean }>({});
 
-  // Fallback high-quality mock products if database is empty
-  const fallbackProducts: Product[] = [
-    {
-      _id: 'mock-1',
-      title: 'OvaBoost Max (Egg Quality Support)',
-      slug: 'ovaboost-max',
-      description: 'Scientific blend of Myo-Inositol, CoQ10, and Folate designed to optimize egg quality and promote regular ovulation.',
-      shortDescription: 'Egg quality and ovarian support formula.',
-      price: 49.99,
-      compareAtPrice: 59.99,
-      currency: 'USD',
-      images: [{ url: 'https://images.unsplash.com/photo-1584017911766-d451b3d0e843?auto=format&fit=crop&q=80&w=600', publicId: 'mock-img-1' }],
-      category: 'Egg Quality',
-      stock: 45,
-      productType: 'physical',
-      isFeatured: true,
-      isActive: true,
-      rating: 4.8,
-      numReviews: 94,
-      createdAt: new Date().toISOString()
-    },
-    {
-      _id: 'mock-2',
-      title: 'Hormone Harmony Elixir',
-      slug: 'hormone-harmony-elixir',
-      description: 'Liquid herbal infusion supporting progesterone synthesis, adrenal wellness, and bloating relief.',
-      shortDescription: 'Liquid herbal extract for hormone regulation.',
-      price: 34.99,
-      compareAtPrice: 42.00,
-      currency: 'USD',
-      images: [{ url: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&q=80&w=600', publicId: 'mock-img-2' }],
-      category: 'Hormone Balance',
-      stock: 12,
-      productType: 'physical',
-      isFeatured: true,
-      isActive: true,
-      rating: 4.9,
-      numReviews: 142,
-      createdAt: new Date().toISOString()
-    },
-    {
-      _id: 'mock-3',
-      title: '1-on-1 Fertility & PCOS Breakthrough Session',
-      slug: 'fertility-pcos-breakthrough-session',
-      description: 'Private 90-minute coaching session to analyze your lab charts, pinpoint mineral deficiencies, and craft your custom protocol.',
-      shortDescription: 'Personal coaching session with Kidist.',
-      price: 150.00,
-      compareAtPrice: 200.00,
-      currency: 'USD',
-      images: [{ url: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&q=80&w=600', publicId: 'mock-img-3' }],
-      category: 'Coaching Services',
-      stock: 100,
-      productType: 'service',
-      isFeatured: true,
-      isActive: true,
-      rating: 5.0,
-      numReviews: 57,
-      createdAt: new Date().toISOString()
-    },
-    {
-      _id: 'mock-4',
-      title: 'Male Fertility Support Formula',
-      slug: 'male-fertility-support-formula',
-      description: 'L-Carnitine, Zinc, and Selenium formulation designed to improve sperm motility and DNA integrity.',
-      shortDescription: 'Support sperm counts and motility.',
-      price: 39.99,
-      compareAtPrice: 48.00,
-      currency: 'USD',
-      images: [{ url: 'https://images.unsplash.com/photo-1607613009820-a29f7bb81c04?auto=format&fit=crop&q=80&w=600', publicId: 'mock-img-4' }],
-      category: 'Male Fertility',
-      stock: 30,
-      productType: 'physical',
-      isFeatured: true,
-      isActive: true,
-      rating: 4.7,
-      numReviews: 38,
-      createdAt: new Date().toISOString()
-    }
-  ];
-
   useEffect(() => {
     const fetchFeaturedProducts = async () => {
       try {
@@ -103,14 +23,10 @@ export const Home: React.FC = () => {
           params: { isFeatured: true, limit: 4 }
         });
         const fetchedData = res.data?.products || res.data?.data?.products || res.data?.data || [];
-        if (fetchedData.length > 0) {
-          setProducts(fetchedData);
-        } else {
-          setProducts(fallbackProducts);
-        }
+        setProducts(fetchedData);
       } catch (err) {
-        console.error('Failed to load featured products, using fallbacks:', err);
-        setProducts(fallbackProducts);
+        console.error('Failed to load featured products:', err);
+        setProducts([]);
       } finally {
         setLoading(false);
       }
@@ -353,6 +269,17 @@ export const Home: React.FC = () => {
           {loading ? (
             <div style={{ display: 'flex', justifyContent: 'center', padding: '4rem 0' }}>
               <div className="spinner" style={spinnerStyle} />
+            </div>
+          ) : products.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '4rem 2rem', backgroundColor: 'var(--color-bg-main)', borderRadius: '12px' }}>
+              <Sparkles size={48} color="var(--color-primary-light)" style={{ marginBottom: '1.5rem', margin: '0 auto 1.5rem' }} />
+              <h3 style={{ fontSize: '1.5rem', color: 'var(--color-primary-dark)', marginBottom: '0.5rem' }}>No Products Available Yet</h3>
+              <p style={{ fontSize: '1rem', color: 'var(--color-text-muted)', marginBottom: '2rem', maxWidth: '400px', margin: '0 auto 2rem' }}>
+                We're curating the perfect products for you. Check back soon as Coach Kidist adds new formulas and services!
+              </p>
+              <Link to="/shop" className="btn btn-primary">
+                Browse Full Catalog <ArrowRight size={16} />
+              </Link>
             </div>
           ) : (
             <div className="grid-4">
