@@ -15,6 +15,8 @@ import ProductDetails from './pages/ProductDetails';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import Profile from './pages/Profile';
+import AboutCompany from './pages/AboutCompany';
+import Portfolio from './pages/Portfolio';
 
 // Admin Pages
 import AdminLayout from './layouts/AdminLayout';
@@ -38,6 +40,8 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/verify-otp" element={<VerifyOTP />} />
+              <Route path="/about" element={<AboutCompany />} />
+              <Route path="/portfolio" element={<Portfolio />} />
 
               {/* Protected Customer Routes */}
               <Route element={<ProtectedRoute />}>
