@@ -3,7 +3,7 @@ import slugify from 'slugify';
 import Product, { PRODUCT_CATEGORIES } from '../models/Product.model';
 import { AppError } from '../utils/AppError';
 import catchAsync from '../utils/catchAsync';
-import { uploadBufferToCloudinary, deleteFromCloudinary } from '../services/cloudinary.service';
+import { uploadBufferToCloudinary, uploadUrlToCloudinary, deleteFromCloudinary } from '../services/cloudinary.service';
 import { verifyAccessToken } from '../utils/generateToken';
 
 /**
@@ -23,6 +23,69 @@ const checkIsAdmin = (req: Request): boolean => {
   return false;
 };
 
+const CLOUDINARY_PRODUCT_FOLDER = 'kiduendu/products';
+
+const parseImageUrls = (body: Record<string, unknown>): string[] => {
+  const raw = body.imageUrls;
+  if (!raw) return [];
+
+  let urls: unknown;
+  if (typeof raw === 'string') {
+    try {
+      urls = JSON.parse(raw);
+    } catch {
+      urls = raw.split(',').map((u) => u.trim()).filter(Boolean);
+    }
+  } else {
+    urls = raw;
+  }
+
+  if (!Array.isArray(urls)) return [];
+
+  const validUrls: string[] = [];
+  for (const entry of urls) {
+    if (typeof entry !== 'string') continue;
+    const trimmed = entry.trim();
+    if (!trimmed) continue;
+    try {
+      const parsed = new URL(trimmed);
+      if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+        validUrls.push(trimmed);
+      }
+    } catch {
+      // skip invalid URLs
+    }
+  }
+
+  return validUrls;
+};
+
+const uploadProductImages = async (
+  files: Express.Multer.File[] | undefined,
+  imageUrls: string[],
+  alt: string
+) => {
+  const fileUploads = (files || []).map(async (file) => {
+    const uploadResult = await uploadBufferToCloudinary(file.buffer, CLOUDINARY_PRODUCT_FOLDER);
+    return {
+      url: uploadResult.secure_url,
+      publicId: uploadResult.public_id,
+      alt,
+    };
+  });
+
+  const urlUploads = imageUrls.map(async (imageUrl) => {
+    const uploadResult = await uploadUrlToCloudinary(imageUrl, CLOUDINARY_PRODUCT_FOLDER);
+    return {
+      url: uploadResult.secure_url,
+      publicId: uploadResult.public_id,
+      alt,
+    };
+  });
+
+  return Promise.all([...fileUploads, ...urlUploads]);
+};
+
 /**
  * @desc    Create a new product (Admin Only)
  * @route   POST /api/products
@@ -30,21 +93,15 @@ const checkIsAdmin = (req: Request): boolean => {
  */
 export const createProduct = catchAsync(async (req: Request, res: Response): Promise<void> => {
   const files = req.files as Express.Multer.File[];
+  const imageUrls = parseImageUrls(req.body);
+  const hasFiles = files && files.length > 0;
+  const hasUrls = imageUrls.length > 0;
 
-  if (!files || files.length === 0) {
-    throw new AppError('At least one product image is required.', 400);
+  if (!hasFiles && !hasUrls) {
+    throw new AppError('At least one product image is required (upload a file or provide an image URL).', 400);
   }
 
-  // Upload images to Cloudinary
-  const images = [];
-  for (const file of files) {
-    const uploadResult = await uploadBufferToCloudinary(file.buffer, 'kiduendu/products');
-    images.push({
-      url: uploadResult.secure_url,
-      publicId: uploadResult.public_id,
-      alt: req.body.title || '',
-    });
-  }
+  const images = await uploadProductImages(files, imageUrls, req.body.title || '');
 
   // Create product
   const productData = {
@@ -238,16 +295,18 @@ export const updateProduct = catchAsync(async (req: Request, res: Response): Pro
     }
   }
 
-  // 2. Upload new images to Cloudinary
-  if (files && files.length > 0) {
-    for (const file of files) {
-      const uploadResult = await uploadBufferToCloudinary(file.buffer, 'kiduendu/products');
-      updatedImages.push({
-        url: uploadResult.secure_url,
-        publicId: uploadResult.public_id,
-        alt: req.body.title || product.title,
-      });
-    }
+  // 2. Upload new images from files and/or URLs to Cloudinary
+  const imageUrls = parseImageUrls(req.body);
+  const hasNewImages =
+    (files && files.length > 0) || imageUrls.length > 0;
+
+  if (hasNewImages) {
+    const newImages = await uploadProductImages(
+      files,
+      imageUrls,
+      req.body.title || product.title
+    );
+    updatedImages.push(...newImages);
   }
 
   // Ensure at least one image remains

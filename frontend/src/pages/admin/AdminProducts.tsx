@@ -13,7 +13,9 @@ import {
   CheckCircle,
   ChevronLeft,
   ChevronRight,
-  Filter
+  Filter,
+  Link2,
+  ImagePlus
 } from 'lucide-react';
 
 const STATIC_CATEGORIES = [
@@ -68,6 +70,15 @@ const initialFormState: ProductForm = {
   isActive: true
 };
 
+const isValidImageUrl = (value: string): boolean => {
+  try {
+    const parsed = new URL(value.trim());
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+  } catch {
+    return false;
+  }
+};
+
 export const AdminProducts: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>(STATIC_CATEGORIES);
@@ -88,6 +99,8 @@ export const AdminProducts: React.FC = () => {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [form, setForm] = useState<ProductForm>(initialFormState);
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [imageUrlInput, setImageUrlInput] = useState('');
   const [existingImages, setExistingImages] = useState<{ url: string; publicId: string }[]>([]);
   const [imagesToDelete, setImagesToDelete] = useState<string[]>([]);
   const [modalError, setModalError] = useState('');
@@ -160,6 +173,8 @@ export const AdminProducts: React.FC = () => {
     setEditingProduct(null);
     setForm(initialFormState);
     setSelectedFiles(null);
+    setImageUrls([]);
+    setImageUrlInput('');
     setExistingImages([]);
     setImagesToDelete([]);
     setModalError('');
@@ -185,6 +200,8 @@ export const AdminProducts: React.FC = () => {
       isActive: prod.isActive !== undefined ? prod.isActive : true
     });
     setSelectedFiles(null);
+    setImageUrls([]);
+    setImageUrlInput('');
     setExistingImages(prod.images || []);
     setImagesToDelete([]);
     setModalError('');
@@ -206,6 +223,29 @@ export const AdminProducts: React.FC = () => {
       console.error('Error deleting product:', err);
       setError(err.response?.data?.message || 'Failed to delete the product.');
     }
+  };
+
+  const handleAddImageUrl = () => {
+    const trimmed = imageUrlInput.trim();
+    if (!trimmed) {
+      setModalError('Please enter an image URL.');
+      return;
+    }
+    if (!isValidImageUrl(trimmed)) {
+      setModalError('Please enter a valid http or https image URL.');
+      return;
+    }
+    if (imageUrls.includes(trimmed)) {
+      setModalError('This image URL is already added.');
+      return;
+    }
+    setImageUrls((prev) => [...prev, trimmed]);
+    setImageUrlInput('');
+    setModalError('');
+  };
+
+  const handleRemoveImageUrl = (url: string) => {
+    setImageUrls((prev) => prev.filter((u) => u !== url));
   };
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -270,8 +310,24 @@ export const AdminProducts: React.FC = () => {
       }
     }
 
+    if (imageUrls.length > 0) {
+      formData.append('imageUrls', JSON.stringify(imageUrls));
+    }
+
+    const remainingExisting = existingImages.filter(
+      (img) => !imagesToDelete.includes(img.publicId)
+    ).length;
+    const newImageCount =
+      (selectedFiles?.length || 0) + imageUrls.length;
+
     try {
       if (editingProduct) {
+        if (remainingExisting + newImageCount === 0) {
+          setModalError('Product must have at least one image.');
+          setSubmitting(false);
+          return;
+        }
+
         // Handle images to delete
         if (imagesToDelete.length > 0) {
           formData.append('deleteImages', JSON.stringify(imagesToDelete));
@@ -283,9 +339,9 @@ export const AdminProducts: React.FC = () => {
         });
         setSuccessMsg('Product updated successfully!');
       } else {
-        // At least one image required for creation
-        if (!selectedFiles || selectedFiles.length === 0) {
-          setModalError('Please upload at least one product image.');
+        // At least one image required for creation (file or URL)
+        if (newImageCount === 0) {
+          setModalError('Please upload at least one product image or add an image URL.');
           setSubmitting(false);
           return;
         }
@@ -318,7 +374,7 @@ export const AdminProducts: React.FC = () => {
     } else {
       // Ensure we don't delete everything
       const remainingCount = existingImages.length - imagesToDelete.length;
-      if (remainingCount <= 1 && (!selectedFiles || selectedFiles.length === 0)) {
+      if (remainingCount <= 1 && (!selectedFiles || selectedFiles.length === 0) && imageUrls.length === 0) {
         alert('A product must maintain at least one active image.');
         return;
       }
@@ -884,45 +940,163 @@ export const AdminProducts: React.FC = () => {
                   </label>
                 </div>
 
-                {/* File Upload / Image Management */}
+                {/* File Upload / Image URL / Image Management */}
                 <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '1.25rem', marginTop: '0.25rem' }}>
-                  <label className="form-label" style={{ display: 'block', marginBottom: '0.5rem' }}>Upload Images (JPEG, PNG, WebP) *</label>
-                  
-                  <div style={{
-                    border: '2px dashed var(--color-border)',
-                    borderRadius: '12px',
-                    padding: '1.5rem',
-                    textAlign: 'center',
-                    cursor: 'pointer',
-                    position: 'relative',
-                    backgroundColor: 'rgba(0,0,0,0.01)',
-                    transition: 'border-color 0.2s'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--color-primary)'}
-                  onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--color-border)'}>
-                    <input
-                      type="file"
-                      multiple
-                      accept="image/*"
-                      onChange={(e) => setSelectedFiles(e.target.files)}
-                      style={{
-                        position: 'absolute',
-                        top: 0,
-                        left: 0,
-                        width: '100%',
-                        height: '100%',
-                        opacity: 0,
-                        cursor: 'pointer'
-                      }}
-                    />
-                    <Upload size={24} style={{ color: 'var(--color-primary)', marginBottom: '0.5rem' }} />
-                    <p style={{ margin: 0, fontSize: '0.85rem', fontWeight: 600 }}>Click or drag files here to upload</p>
-                    <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Max file size: 5MB. You can select multiple images.</p>
+                  <label className="form-label" style={{ display: 'block', marginBottom: '0.75rem' }}>
+                    Product Images *
+                  </label>
+
+                  <div style={{ display: 'grid', gap: '1rem' }}>
+                    {/* File upload */}
+                    <div style={{
+                      border: '2px dashed var(--color-border)',
+                      borderRadius: '12px',
+                      padding: '1.25rem',
+                      textAlign: 'center',
+                      cursor: 'pointer',
+                      position: 'relative',
+                      backgroundColor: 'rgba(0,0,0,0.01)',
+                      transition: 'border-color 0.2s'
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--color-primary)'}
+                    onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--color-border)'}>
+                      <input
+                        type="file"
+                        multiple
+                        accept="image/jpeg,image/png,image/webp,image/gif"
+                        onChange={(e) => setSelectedFiles(e.target.files)}
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          width: '100%',
+                          height: '100%',
+                          opacity: 0,
+                          cursor: 'pointer'
+                        }}
+                      />
+                      <Upload size={22} style={{ color: 'var(--color-primary)', marginBottom: '0.35rem' }} />
+                      <p style={{ margin: 0, fontSize: '0.85rem', fontWeight: 600 }}>Upload from your computer</p>
+                      <p style={{ margin: '0.25rem 0 0 0', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
+                        JPEG, PNG, WebP — max 5MB each, multiple allowed
+                      </p>
+                    </div>
+
+                    {/* URL input */}
+                    <div style={{
+                      border: '1px solid var(--color-border)',
+                      borderRadius: '12px',
+                      padding: '1rem',
+                      backgroundColor: 'rgba(74, 117, 89, 0.03)',
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.65rem' }}>
+                        <Link2 size={16} style={{ color: 'var(--color-primary)' }} />
+                        <span style={{ fontSize: '0.85rem', fontWeight: 600 }}>Or add image from URL</span>
+                      </div>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <input
+                          type="url"
+                          value={imageUrlInput}
+                          onChange={(e) => setImageUrlInput(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              handleAddImageUrl();
+                            }
+                          }}
+                          placeholder="https://example.com/product-image.jpg"
+                          className="form-input"
+                          style={{ flex: 1, fontSize: '0.85rem' }}
+                        />
+                        <button
+                          type="button"
+                          onClick={handleAddImageUrl}
+                          className="btn btn-outline"
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '0.35rem',
+                            whiteSpace: 'nowrap',
+                            fontSize: '0.85rem',
+                            padding: '0.5rem 0.85rem',
+                          }}
+                        >
+                          <ImagePlus size={15} /> Add URL
+                        </button>
+                      </div>
+                      <p style={{ margin: '0.5rem 0 0', fontSize: '0.72rem', color: 'var(--color-text-muted)' }}>
+                        Paste a direct image link. It will be saved to our CDN for fast loading.
+                      </p>
+                    </div>
                   </div>
 
                   {selectedFiles && selectedFiles.length > 0 && (
                     <div style={{ marginTop: '0.75rem', fontSize: '0.8rem', color: 'var(--color-primary)', fontWeight: 600 }}>
-                      Selected for upload: {selectedFiles.length} file(s) ({Array.from(selectedFiles).map(f => f.name).join(', ')})
+                      Files selected: {selectedFiles.length} ({Array.from(selectedFiles).map(f => f.name).join(', ')})
+                    </div>
+                  )}
+
+                  {imageUrls.length > 0 && (
+                    <div style={{ marginTop: '1rem' }}>
+                      <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-text-muted)', display: 'block', marginBottom: '0.5rem' }}>
+                        Image URLs to import ({imageUrls.length})
+                      </span>
+                      <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                        {imageUrls.map((url) => (
+                          <div
+                            key={url}
+                            style={{
+                              width: '72px',
+                              position: 'relative',
+                            }}
+                          >
+                            <div
+                              style={{
+                                width: '72px',
+                                height: '72px',
+                                borderRadius: '8px',
+                                overflow: 'hidden',
+                                border: '1px solid var(--color-border)',
+                                background: '#f5f5f5',
+                              }}
+                            >
+                              <img
+                                src={url}
+                                alt=""
+                                loading="lazy"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).src = 'https://via.placeholder.com/72?text=URL';
+                                }}
+                                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                              />
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveImageUrl(url)}
+                              title="Remove URL"
+                              style={{
+                                position: 'absolute',
+                                top: '-6px',
+                                right: '-6px',
+                                width: '20px',
+                                height: '20px',
+                                borderRadius: '50%',
+                                border: 'none',
+                                background: 'var(--color-error)',
+                                color: '#fff',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontSize: '12px',
+                                lineHeight: 1,
+                              }}
+                            >
+                              <X size={12} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   )}
 

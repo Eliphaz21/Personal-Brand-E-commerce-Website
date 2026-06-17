@@ -15,6 +15,8 @@ export const uploadBufferToCloudinary = (
       {
         folder,
         resource_type: 'auto',
+        fetch_format: 'auto',
+        quality: 'auto',
       },
       (error, result) => {
         if (error) {
@@ -25,6 +27,22 @@ export const uploadBufferToCloudinary = (
       }
     );
     uploadStream.end(fileBuffer);
+  });
+};
+
+/**
+ * Fetches a remote image URL and uploads it to Cloudinary.
+ * Images are re-hosted on Cloudinary CDN for consistent delivery and optimization.
+ */
+export const uploadUrlToCloudinary = (
+  imageUrl: string,
+  folder: string
+): Promise<UploadApiResponse> => {
+  return cloudinary.uploader.upload(imageUrl, {
+    folder,
+    resource_type: 'image',
+    fetch_format: 'auto',
+    quality: 'auto',
   });
 };
 
