@@ -148,7 +148,7 @@ export const Home: React.FC = () => {
               backgroundColor: 'var(--color-primary-light)'
             }}>
               <img 
-                src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=800" 
+                src="https://p16-common-sign.tiktokcdn.com/tos-maliva-avt-0068/f4e9cd42f22ac626004332a37464cd61~tplv-tiktokx-cropcenter:1080:1080.jpeg?dr=14579&refresh_token=f9732c81&x-expires=1781877600&x-signature=xJaVAb3gcwuah5wMcK7vRZ%2F9%2BO4%3D&t=4d5b0474&ps=13740610&shp=a5d48078&shcp=81f88b70&idc=my" 
                 alt="Kidist - Fertility Coach" 
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
@@ -176,7 +176,7 @@ export const Home: React.FC = () => {
           <div>
             <span style={{ fontSize: '0.9rem', color: 'var(--color-secondary)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Meet the Founder</span>
             <h2 style={{ fontSize: '2.5rem', color: 'var(--color-primary-dark)', marginTop: '0.5rem', marginBottom: '1.5rem' }}>
-              Hi, I’m Kidist.
+              Hi, I’m Kidist Moges.
             </h2>
             <p style={{ color: 'var(--color-text-muted)', marginBottom: '1.25rem', fontSize: '1.05rem' }}>
               I created KidEnDu after watching countless women walk through hormone imbalances, PCOS symptoms, and fertility struggles feeling isolated and confused.
@@ -186,7 +186,7 @@ export const Home: React.FC = () => {
             </p>
             <div className="grid-3" style={{ borderTop: '1px solid var(--color-border)', paddingTop: '2rem' }}>
               <div>
-                <h3 style={{ color: 'var(--color-secondary)', fontSize: '2rem', margin: 0 }}>10k+</h3>
+                <h3 style={{ color: 'var(--color-secondary)', fontSize: '2rem', margin: 0 }}>100+</h3>
                 <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', margin: 0 }}>Clients Empowered</p>
               </div>
               <div>

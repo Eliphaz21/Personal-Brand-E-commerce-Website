@@ -8,6 +8,7 @@ export const AdminLayout: React.FC = () => {
     { path: '/admin', label: 'Overview' },
     { path: '/admin/products', label: 'Products' },
     { path: '/admin/orders', label: 'Orders' },
+    { path: '/admin/users', label: 'Users' },
     { path: '/admin/inbox', label: 'Inbox' },
   ];
 

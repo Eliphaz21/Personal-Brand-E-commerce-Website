@@ -4,10 +4,12 @@ export interface User {
   name: string;
   email: string;
   role: 'guest' | 'customer' | 'admin';
-  avatar?: string;
+  avatar?: string | { url: string; publicId: string };
   bio?: string;
   isVerified: boolean;
+  isBlocked?: boolean;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export type ProductType = 'physical' | 'service' | 'affiliate';
