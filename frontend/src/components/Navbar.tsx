@@ -1,12 +1,10 @@
 import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { useCart } from '../hooks/useCart';
-import { ShoppingBag, User, Search } from 'lucide-react';
+import { User, Search } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const { isAuthenticated } = useAuth();
-  const { totalItemsCount } = useCart();
 
   return (
     <header style={{
@@ -15,7 +13,7 @@ export const Navbar: React.FC = () => {
       left: 0,
       right: 0,
       zIndex: 1000,
-      background: '#FFE4C4',
+      background: '#FFFFFF',
       padding: '12px 0'
     }}>
       <div className="container" style={{ display: 'flex', justifyContent: 'center' }}>
@@ -43,22 +41,12 @@ export const Navbar: React.FC = () => {
           <nav style={{ display: 'flex', gap: '2rem', alignItems: 'center', justifyContent: 'center', flex: 1 }} aria-label="Primary navigation">
             <NavLink to="/" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} style={{ ...navLinkStyle, fontSize: '0.95rem', color: '#3D2B1F' }}>Home</NavLink>
             <NavLink to="/about" style={{ ...navLinkStyle, fontSize: '0.95rem', color: '#3D2B1F' }}>About Company</NavLink>
-            <NavLink to="/portfolio" style={{ ...navLinkStyle, fontSize: '0.95rem', color: '#3D2B1F' }}>Client Profile</NavLink>
           </nav>
 
           {/* Right area: search, cart, auth */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', minWidth: 160, justifyContent: 'flex-end' }}>
             <Link to="/search" aria-label="Search" style={{ color: '#3D2B1F', display: 'flex', alignItems: 'center' }}>
               <Search size={18} />
-            </Link>
-
-            <Link to="/cart" aria-label="Cart" style={{ color: '#3D2B1F', display: 'flex', alignItems: 'center' }}>
-              <ShoppingBag size={18} />
-              {isAuthenticated && totalItemsCount > 0 && (
-                <span className="cart-badge" style={{ marginLeft: 6, background: '#FFE4C4', color: '#3D2B1F', padding: '2px 7px', borderRadius: 999, fontSize: '0.75rem', fontWeight: 700 }}>
-                  {totalItemsCount}
-                </span>
-              )}
             </Link>
 
             {isAuthenticated ? (

@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useCart } from '../hooks/useCart';
 import apiClient from '../services/apiClient';
 import type { Product } from '../types';
-import { Star, ArrowRight, Heart, Sparkles, Award, User, ShoppingCart, CheckCircle } from 'lucide-react';
+import { Star, ArrowRight, Heart, Sparkles, ShoppingCart, CheckCircle } from 'lucide-react';
 
 export const Home: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -63,26 +63,7 @@ export const Home: React.FC = () => {
     { name: 'Coaching Services', desc: 'Private consultation and tailored action plans.', bg: 'linear-gradient(135deg, #edf3f7 0%, #d0e1ec 100%)' }
   ];
 
-  const testimonials = [
-    {
-      text: "After 3 years of struggling with PCOS and irregular cycles, Kidist's hormone protocol and supplements worked miracles. I got my positive pregnancy test in just 4 months!",
-      author: "Sarah M.",
-      verified: true,
-      tag: "PCOS Recovery"
-    },
-    {
-      text: "The OvaBoost supplements combined with the 1-on-1 sessions gave me the exact step-by-step roadmap I needed. My egg count metrics improved, and I felt so supported.",
-      author: "Jessica T.",
-      verified: true,
-      tag: "Ovarian Quality"
-    },
-    {
-      text: "Highly recommend the coaching and supplements. She takes a holistic, root-cause approach rather than just masking symptoms. Absolute lifesaver for fertility coaching.",
-      author: "Elena R.",
-      verified: true,
-      tag: "Hormone Harmony"
-    }
-  ];
+
 
   return (
     <div className="home-page">
@@ -371,44 +352,7 @@ export const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* ─── Testimonials (Glass Panels) ───────────────────────────────────── */}
-      <section style={{ padding: '6rem 0', backgroundColor: 'var(--color-bg-main)' }}>
-        <div className="container">
-          <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-            <span style={{ fontSize: '0.9rem', color: 'var(--color-secondary)', fontWeight: 600, textTransform: 'uppercase' }}>Success Stories</span>
-            <h2 style={{ fontSize: '2.5rem', color: 'var(--color-primary-dark)' }}>Real Recovery Journals</h2>
-          </div>
 
-          <div className="grid-3">
-            {testimonials.map((t, i) => (
-              <div key={i} className="glass-panel testimonial-card" style={testimonialCardStyle}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-                  <div style={{ display: 'flex', gap: '0.1rem' }}>
-                    {[...Array(5)].map((_, idx) => (
-                      <Star key={idx} size={14} color="#ffd700" fill="#ffd700" />
-                    ))}
-                  </div>
-                  <span style={{ fontSize: '0.75rem', backgroundColor: 'var(--color-primary-light)', color: 'var(--color-primary-dark)', padding: '0.25rem 0.6rem', borderRadius: '4px', fontWeight: 600 }}>
-                    {t.tag}
-                  </span>
-                </div>
-                <p style={{ fontStyle: 'italic', fontSize: '0.95rem', color: 'var(--color-text-main)', marginBottom: '1.5rem', lineHeight: '1.6' }}>
-                  "{t.text}"
-                </p>
-                <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                  <div style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: 'var(--color-primary-light)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <User size={16} color="var(--color-primary-dark)" />
-                  </div>
-                  <div>
-                    <h5 style={{ margin: 0, fontSize: '0.9rem', fontWeight: 600 }}>{t.author}</h5>
-                    <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--color-success)' }}>✓ Verified Mother</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* ─── Newsletter Call to Action ──────────────────────────────────────── */}
       <section style={ctaSectionStyle}>

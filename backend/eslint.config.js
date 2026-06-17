@@ -6,6 +6,8 @@ export default [
   js.configs.recommended,
   {
     files: ['src/**/*.ts'],
+    // Enable Node environment so globals like `process`, `console`, and `Buffer` are recognized
+    env: { node: true, es2020: true },
     languageOptions: {
       parser: tsParser,
       parserOptions: {

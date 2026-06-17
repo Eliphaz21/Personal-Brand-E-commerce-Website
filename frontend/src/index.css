@@ -18,7 +18,7 @@
   
   --color-bisque: #FFE4C4;
   --color-bistre: #3D2B1F;
-  --color-bg-main: var(--color-bisque);
+  --color-bg-main: #FFFFFF;
   --color-bg-card: hsla(0, 0%, 100%, 0.7);
   --color-text-main: hsl(var(--text-main-hsl));
   --color-text-muted: hsl(210, 10%, 45%);
