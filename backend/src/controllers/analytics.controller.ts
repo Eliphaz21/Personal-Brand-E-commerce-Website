@@ -16,7 +16,7 @@ export const getDashboardOverview = catchAsync(async (_req: Request, res: Respon
     {
       $match: {
         paymentStatus: 'paid',
-        status: { $ne: 'cancelled' },
+        orderStatus: { $ne: 'cancelled' },
       },
     },
     {
@@ -61,7 +61,7 @@ export const getSalesChartData = catchAsync(async (_req: Request, res: Response)
       $match: {
         createdAt: { $gte: d },
         paymentStatus: 'paid',
-        status: { $ne: 'cancelled' },
+        orderStatus: { $ne: 'cancelled' },
       },
     },
     {
@@ -106,7 +106,7 @@ export const getLowStockProducts = catchAsync(async (req: Request, res: Response
   const products = await Product.find({ stock: { $lte: lowStockThreshold } })
     .sort({ stock: 1 })
     .limit(20)
-    .select('name sku stock price slug images');
+    .select('title sku stock price slug images');
 
   sendSuccess(res, { products }, 'Low stock products fetched successfully');
 });

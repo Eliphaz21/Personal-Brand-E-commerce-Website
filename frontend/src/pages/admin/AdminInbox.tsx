@@ -54,7 +54,11 @@ export const AdminInbox: React.FC = () => {
       setMessages(data);
     } catch (err: any) {
       console.error('Error fetching admin messages:', err);
-      setError('Could not retrieve support messages. Please try again.');
+      setMessages([]);
+      setError(
+        err.response?.data?.message ||
+        'Could not retrieve support messages. Please try again.'
+      );
     } finally {
       setLoading(false);
     }

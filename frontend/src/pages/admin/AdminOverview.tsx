@@ -35,13 +35,20 @@ interface ChartDataPoint {
 
 interface LowStockProduct {
   _id: string;
-  name: string;
+  title: string;
   sku: string;
   stock: number;
   price: number;
   slug: string;
   images: { url: string; publicId: string; alt?: string }[];
 }
+
+const EMPTY_STATS: DashboardStats = {
+  revenue: 0,
+  orders: 0,
+  users: 0,
+  products: 0,
+};
 
 export const AdminOverview: React.FC = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -60,48 +67,28 @@ export const AdminOverview: React.FC = () => {
         apiClient.get('/admin/analytics/low-stock?threshold=10')
       ]);
 
-      setStats(statsRes.data?.data || statsRes.data || null);
-      setChartData(chartRes.data?.data?.chartData || chartRes.data?.chartData || []);
-      setLowStock(stockRes.data?.data?.products || stockRes.data?.products || []);
+      const statsPayload = statsRes.data?.data ?? statsRes.data;
+      setStats({
+        revenue: statsPayload?.revenue ?? 0,
+        orders: statsPayload?.orders ?? 0,
+        users: statsPayload?.users ?? 0,
+        products: statsPayload?.products ?? 0,
+      });
+
+      const chartPayload = chartRes.data?.data ?? chartRes.data;
+      setChartData(chartPayload?.chartData ?? []);
+
+      const stockPayload = stockRes.data?.data ?? stockRes.data;
+      setLowStock(stockPayload?.products ?? []);
     } catch (err: any) {
       console.error('Error fetching dashboard analytics:', err);
-      setError('Failed to fetch dashboard metrics. Please try again.');
-      
-      // Fallback demo data if backend is empty or failing
-      setStats({
-        revenue: 12450.85,
-        orders: 142,
-        users: 84,
-        products: 18
-      });
-      setChartData([
-        { month: 'Jan 2026', revenue: 850, orders: 10 },
-        { month: 'Feb 2026', revenue: 1200, orders: 15 },
-        { month: 'Mar 2026', revenue: 2100, orders: 24 },
-        { month: 'Apr 2026', revenue: 1800, orders: 20 },
-        { month: 'May 2026', revenue: 3400, orders: 38 },
-        { month: 'Jun 2026', revenue: 3100, orders: 35 }
-      ]);
-      setLowStock([
-        {
-          _id: 'prod-1',
-          name: 'Premium PCOS Support Supplement',
-          sku: 'SUPP-PCOS-01',
-          stock: 4,
-          price: 49.99,
-          slug: 'premium-pcos-support-supplement',
-          images: []
-        },
-        {
-          _id: 'prod-2',
-          name: 'Kidist\'s Male Fertility Boost Capsule',
-          sku: 'SUPP-MALE-02',
-          stock: 2,
-          price: 59.99,
-          slug: 'kidists-male-fertility-boost-capsule',
-          images: []
-        }
-      ]);
+      setError(
+        err.response?.data?.message ||
+        'Failed to fetch dashboard metrics. Please try again.'
+      );
+      setStats(EMPTY_STATS);
+      setChartData([]);
+      setLowStock([]);
     }
   };
 
@@ -182,7 +169,7 @@ export const AdminOverview: React.FC = () => {
           gap: '0.75rem'
         }}>
           <AlertTriangle size={20} />
-          <span>{error} (Viewing offline demo mode)</span>
+          <span>{error}</span>
         </div>
       )}
 
@@ -474,7 +461,7 @@ export const AdminOverview: React.FC = () => {
                 >
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                     <span style={{ fontWeight: 600, color: 'var(--color-primary-dark)', fontSize: '0.95rem' }}>
-                      {prod.name}
+                      {prod.title}
                     </span>
                     <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', fontFamily: 'monospace' }}>
                       SKU: {prod.sku || 'N/A'}

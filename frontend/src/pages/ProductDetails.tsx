@@ -31,137 +31,32 @@ export const ProductDetails: React.FC = () => {
   const [adding, setAdding] = useState(false);
   const [addSuccess, setAddSuccess] = useState(false);
 
-  // Constants - Mock Catalog for matching
-  const fallbackCatalog: Product[] = [
-    {
-      _id: 'mock-1',
-      title: 'OvaBoost Max (Egg Quality Support)',
-      slug: 'ovaboost-max',
-      description: 'Scientific blend of Myo-Inositol, CoQ10, and Folate designed to optimize egg quality and promote regular ovulation. It works by reinforcing the ovarian defense system, targeting cellular oxidation, and balancing menstrual cyclicity. Formulated with standard naturopathic ratios and clinical test batches for maximum reliability.',
-      shortDescription: 'Egg quality and ovarian support formula.',
-      price: 49.99,
-      compareAtPrice: 59.99,
-      currency: 'USD',
-      images: [
-        { url: 'https://images.unsplash.com/photo-1584017911766-d451b3d0e843?auto=format&fit=crop&q=80&w=600', publicId: 'mock-img-1' },
-        { url: 'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?auto=format&fit=crop&q=80&w=600', publicId: 'mock-img-1b' }
-      ],
-      category: 'Egg Quality',
-      stock: 45,
-      sku: 'OV-BST-MAX-01',
-      weight: 120,
-      productType: 'physical',
-      isFeatured: true,
-      isActive: true,
-      rating: 4.8,
-      numReviews: 94,
-      createdAt: new Date().toISOString()
-    },
-    {
-      _id: 'mock-2',
-      title: 'Hormone Harmony Elixir',
-      slug: 'hormone-harmony-elixir',
-      description: 'Liquid herbal infusion supporting progesterone synthesis, adrenal wellness, and bloating relief. Utilizes organic vitex agnus-castus, wild yam extract, and dandelion root for holistic regulation of menstrual periods. Free from chemical solvents and gluten.',
-      shortDescription: 'Liquid herbal extract for hormone regulation.',
-      price: 34.99,
-      compareAtPrice: 0,
-      currency: 'USD',
-      images: [
-        { url: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?auto=format&fit=crop&q=80&w=600', publicId: 'mock-img-2' },
-        { url: 'https://images.unsplash.com/photo-1508746829417-e6f548d8d6ed?auto=format&fit=crop&q=80&w=600', publicId: 'mock-img-2b' }
-      ],
-      category: 'Hormone Balance',
-      stock: 12,
-      sku: 'HR-HMY-ELX-02',
-      weight: 80,
-      productType: 'physical',
-      isFeatured: true,
-      isActive: true,
-      rating: 4.9,
-      numReviews: 142,
-      createdAt: new Date().toISOString()
-    },
-    {
-      _id: 'mock-3',
-      title: '1-on-1 Fertility & PCOS Breakthrough Session',
-      slug: 'fertility-pcos-breakthrough-session',
-      description: 'Private 90-minute coaching session to analyze your lab charts, pinpoint mineral deficiencies, and craft your custom protocol. We review your cycle tracking histories, ovulation records, and previous supplement regimens. Delivered via secure Zoom consult including full written PDF protocol summaries.',
-      shortDescription: 'Personal coaching session with Kidist.',
-      price: 150.00,
-      compareAtPrice: 200.00,
-      currency: 'USD',
-      images: [{ url: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&q=80&w=600', publicId: 'mock-img-3' }],
-      category: 'Coaching Services',
-      stock: 100,
-      sku: 'CS-1ON1-PCOS-03',
-      weight: 0,
-      productType: 'service',
-      isFeatured: true,
-      isActive: true,
-      rating: 5.0,
-      numReviews: 57,
-      createdAt: new Date().toISOString()
-    }
-  ];
-
-  const fallbackReviews: Review[] = [
-    {
-      _id: 'rev-mock-1',
-      productId: 'mock-1',
-      user: { _id: 'u-1', name: 'Maria K.', avatar: '' },
-      rating: 5,
-      comment: 'Absolutely love this OvaBoost supplement. My cycles became regular, and I just found out I am pregnant last week! Thank you Kidist!',
-      isVerifiedPurchase: true,
-      createdAt: new Date(Date.now() - 86400000 * 5).toISOString()
-    },
-    {
-      _id: 'rev-mock-2',
-      productId: 'mock-1',
-      user: { _id: 'u-2', name: 'Tasha G.', avatar: '' },
-      rating: 4,
-      comment: 'Very clean formulation. Easy on the stomach. Noticeable reduction in my PCOS breakouts. Highly recommend trying this protocol.',
-      isVerifiedPurchase: true,
-      createdAt: new Date(Date.now() - 86400000 * 12).toISOString()
-    }
-  ];
-
   // Fetch Product & Reviews on Mount/Slug Change
   useEffect(() => {
     const fetchProductDetails = async () => {
       setLoading(true);
+      setProduct(null);
+      setReviews([]);
       try {
-        // Fetch product
         const prodRes = await apiClient.get(`/products/${slug}`);
         const foundProd = prodRes.data?.product || prodRes.data?.data?.product || prodRes.data?.data || null;
 
         if (foundProd) {
           setProduct(foundProd);
-          fetchReviews(foundProd._id);
-        } else {
-          // Look inside fallback array
-          const localProd = fallbackCatalog.find(p => p.slug === slug);
-          if (localProd) {
-            setProduct(localProd);
-            setReviews(fallbackReviews);
-          } else {
-            setProduct(null);
-          }
+          await fetchReviews(foundProd._id);
         }
       } catch (err) {
-        console.error('Failed to fetch product details, trying local fallback:', err);
-        const localProd = fallbackCatalog.find(p => p.slug === slug);
-        if (localProd) {
-          setProduct(localProd);
-          setReviews(fallbackReviews);
-        } else {
-          setProduct(null);
-        }
+        console.error('Failed to fetch product details:', err);
+        setProduct(null);
+        setReviews([]);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProductDetails();
+    if (slug) {
+      fetchProductDetails();
+    }
     setQuantity(1);
     setSelectedImage(0);
   }, [slug]);
@@ -169,11 +64,18 @@ export const ProductDetails: React.FC = () => {
   const fetchReviews = async (productId: string) => {
     try {
       const revRes = await apiClient.get(`/reviews/product/${productId}`);
-      const fetchedReviews = revRes.data?.reviews || revRes.data?.data?.reviews || revRes.data?.data || [];
-      setReviews(fetchedReviews.length > 0 ? fetchedReviews : fallbackReviews);
+      const fetchedReviews = revRes.data?.reviews || revRes.data?.data?.reviews || [];
+      setReviews(
+        fetchedReviews.map((review: Review & { userId?: { _id: string; name: string; avatar?: string } }) => ({
+          ...review,
+          user: review.user || (review.userId && typeof review.userId === 'object'
+            ? { _id: review.userId._id, name: review.userId.name, avatar: review.userId.avatar }
+            : undefined),
+        }))
+      );
     } catch (err) {
-      console.error('Failed to get reviews, using local fallbacks:', err);
-      setReviews(fallbackReviews);
+      console.error('Failed to get reviews:', err);
+      setReviews([]);
     }
   };
 

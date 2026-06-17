@@ -45,7 +45,11 @@ export const AdminOrders: React.FC = () => {
       setOrders(data);
     } catch (err: any) {
       console.error('Error fetching admin orders:', err);
-      setError('Could not retrieve orders listing. Please try again.');
+      setOrders([]);
+      setError(
+        err.response?.data?.message ||
+        'Could not retrieve orders listing. Please try again.'
+      );
     } finally {
       setLoading(false);
     }

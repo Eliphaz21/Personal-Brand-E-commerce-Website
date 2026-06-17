@@ -96,23 +96,29 @@ export const AdminProducts: React.FC = () => {
   // Fetch products
   const fetchProducts = async () => {
     setLoading(true);
+    setError('');
     try {
-      const queryParams = new URLSearchParams({
-        page: page.toString(),
-        limit: limit.toString(),
-        search,
-        category: categoryFilter
-      });
+      const params: Record<string, string | number> = {
+        page,
+        limit,
+        sort: 'newest',
+      };
+      if (search.trim()) params.search = search.trim();
+      if (categoryFilter) params.category = categoryFilter;
 
-      const res = await apiClient.get(`/products?${queryParams.toString()}`);
+      const res = await apiClient.get('/products', { params });
       const data = res.data?.data || res.data;
-      
+
       setProducts(data.products || []);
       setTotalPages(data.pages || 1);
       setTotalCount(data.total || 0);
     } catch (err: any) {
       console.error('Error fetching admin products:', err);
-      setError('Could not retrieve product listing. Please reload page.');
+      setProducts([]);
+      setError(
+        err.response?.data?.message ||
+        'Could not retrieve product listing. Please reload page.'
+      );
     } finally {
       setLoading(false);
     }
@@ -133,7 +139,7 @@ export const AdminProducts: React.FC = () => {
 
   useEffect(() => {
     fetchProducts();
-  }, [page, categoryFilter]);
+  }, [page, categoryFilter, search]);
 
   useEffect(() => {
     fetchCategories();
@@ -142,27 +148,12 @@ export const AdminProducts: React.FC = () => {
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setPage(1);
-    fetchProducts();
   };
 
   const handleResetFilters = () => {
     setSearch('');
     setCategoryFilter('');
     setPage(1);
-    // Directly fetch with empty values
-    setLoading(true);
-    apiClient.get(`/products?page=1&limit=${limit}`)
-      .then(res => {
-        const data = res.data?.data || res.data;
-        setProducts(data.products || []);
-        setTotalPages(data.pages || 1);
-        setTotalCount(data.total || 0);
-      })
-      .catch(err => {
-        console.error(err);
-        setError('Could not retrieve product listing.');
-      })
-      .finally(() => setLoading(false));
   };
 
   const openAddModal = () => {
