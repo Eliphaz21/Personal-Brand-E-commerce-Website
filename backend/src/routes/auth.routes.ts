@@ -20,6 +20,7 @@ import {
   forgotPassword,
   resetPassword,
   changePassword,
+  requestChangePasswordOTP,
 } from '../controllers/auth.controller';
 
 const router = Router();
@@ -35,6 +36,7 @@ router.post('/forgot-password', validate(forgotPasswordSchema), forgotPassword);
 router.post('/reset-password', validate(resetPasswordSchema), resetPassword);
 
 // ─── Private (Authenticated) Auth Endpoints ──────────────────────────────────
+router.post('/change-password/request-otp', protect, requestChangePasswordOTP);
 router.post('/change-password', protect, validate(changePasswordSchema), changePassword);
 
 export default router;

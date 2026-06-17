@@ -19,8 +19,28 @@ import { env } from '../config/env';
 const getCookieOptions = () => ({
   httpOnly: true,
   secure: env.NODE_ENV === 'production',
-  sameSite: 'strict' as const,
+  // Lax in dev allows the httpOnly cookie on cross-origin API calls from the Vite dev server
+  sameSite: (env.NODE_ENV === 'production' ? 'strict' : 'lax') as 'strict' | 'lax',
+  path: '/',
   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
+});
+
+const clearRefreshCookieOptions = () => ({
+  httpOnly: true,
+  secure: env.NODE_ENV === 'production',
+  sameSite: (env.NODE_ENV === 'production' ? 'strict' : 'lax') as 'strict' | 'lax',
+  path: '/',
+});
+
+/** Safe user payload returned to the client after auth / refresh */
+const formatAuthUser = (user: InstanceType<typeof User>) => ({
+  id: user._id,
+  name: user.name,
+  email: user.email,
+  role: user.role,
+  avatar: user.avatar?.url || '',
+  isVerified: user.isVerified,
+  createdAt: user.createdAt,
 });
 
 /**
@@ -138,13 +158,7 @@ export const verifyOTP = catchAsync(async (req: Request, res: Response): Promise
     message: 'Email verified successfully! You are now logged in.',
     accessToken,
     token: accessToken,
-    user: {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      avatar: user.avatar,
-    },
+    user: formatAuthUser(user),
   });
 });
 
@@ -243,13 +257,7 @@ export const login = catchAsync(async (req: Request, res: Response): Promise<voi
     message: 'Logged in successfully.',
     accessToken,
     token: accessToken,
-    user: {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      avatar: user.avatar,
-    },
+    user: formatAuthUser(user),
   });
 });
 
@@ -292,6 +300,7 @@ export const refreshToken = catchAsync(async (req: Request, res: Response): Prom
       success: true,
       accessToken: newAccessToken,
       token: newAccessToken,
+      user: formatAuthUser(user),
     });
   } catch (err) {
     throw new AppError('Invalid or expired refresh token.', 401);
@@ -311,11 +320,7 @@ export const logout = catchAsync(async (req: Request, res: Response): Promise<vo
     await User.findOneAndUpdate({ refreshToken: token }, { $unset: { refreshToken: 1 } });
   }
 
-  res.clearCookie('refreshToken', {
-    httpOnly: true,
-    secure: env.NODE_ENV === 'production',
-    sameSite: 'strict',
-  });
+  res.clearCookie('refreshToken', clearRefreshCookieOptions());
 
   res.status(200).json({
     success: true,
@@ -401,41 +406,82 @@ export const resetPassword = catchAsync(async (req: Request, res: Response): Pro
 });
 
 /**
- * @desc    Change password while logged in
- * @route   POST /api/auth/change-password
+ * @desc    Send OTP to verify identity before changing password
+ * @route   POST /api/auth/change-password/request-otp
  * @access  Private
  */
-export const changePassword = catchAsync(async (req: Request, res: Response): Promise<void> => {
-  const { currentPassword, newPassword } = req.body;
+export const requestChangePasswordOTP = catchAsync(async (req: Request, res: Response): Promise<void> => {
   const userId = req.user?.userId;
-
-  const user = await User.findById(userId).select('+passwordHash');
+  const user = await User.findById(userId);
 
   if (!user) {
     throw new AppError('User not found.', 404);
   }
 
-  // Check current password
+  const otp = generateOTP();
+  const otpExpiry = getOTPExpiry(10);
+
+  user.otp = otp;
+  user.otpExpiry = otpExpiry;
+  user.otpResendCount = 0;
+  await user.save();
+
+  await sendOTPEmail(user.email, user.name, otp);
+
+  res.status(200).json({
+    success: true,
+    message: 'A verification code has been sent to your email address.',
+  });
+});
+
+/**
+ * @desc    Change password while logged in (requires email OTP + current password)
+ * @route   POST /api/auth/change-password
+ * @access  Private
+ */
+export const changePassword = catchAsync(async (req: Request, res: Response): Promise<void> => {
+  const { currentPassword, newPassword, otp } = req.body;
+  const userId = req.user?.userId;
+
+  const user = await User.findById(userId).select('+passwordHash +otp +otpExpiry');
+
+  if (!user) {
+    throw new AppError('User not found.', 404);
+  }
+
+  if (!user.otp || !user.otpExpiry) {
+    throw new AppError('Please request a verification code first.', 400);
+  }
+
+  if (user.otp !== otp) {
+    throw new AppError('Invalid verification code.', 400);
+  }
+
+  if (new Date() > user.otpExpiry) {
+    throw new AppError('Verification code has expired. Please request a new one.', 400);
+  }
+
   if (!(await user.comparePassword(currentPassword))) {
     throw new AppError('Incorrect current password.', 400);
   }
 
-  // Hash new password and save
+  if (await user.comparePassword(newPassword)) {
+    throw new AppError('New password must be different from your current password.', 400);
+  }
+
   const passwordHash = await bcrypt.hash(newPassword, 12);
   user.passwordHash = passwordHash;
-  user.refreshToken = undefined; // Force re-login on all devices
+  user.refreshToken = undefined;
+  user.otp = undefined;
+  user.otpExpiry = undefined;
+  user.otpResendCount = 0;
 
   await user.save();
 
-  // Clear cookie as authentication is revoked
-  res.clearCookie('refreshToken', {
-    httpOnly: true,
-    secure: env.NODE_ENV === 'production',
-    sameSite: 'strict',
-  });
+  res.clearCookie('refreshToken', clearRefreshCookieOptions());
 
   res.status(200).json({
     success: true,
-    message: 'Password updated successfully. Please log in again.',
+    message: 'Password updated successfully. Please log in again with your new password.',
   });
 });

@@ -1,6 +1,11 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useCallback } from 'react';
 import apiClient, { setClientAccessToken } from '../services/apiClient';
 import type { User } from '../types';
+import {
+  getTokenFromResponse,
+  getUserFromResponse,
+  normalizeUser,
+} from '../utils/authSession';
 
 interface AuthContextType {
   user: User | null;
@@ -14,6 +19,8 @@ interface AuthContextType {
   logout: () => Promise<void>;
   forgotPassword: (email: string) => Promise<void>;
   resetPassword: (email: string, otp: string, newPassword: string) => Promise<void>;
+  requestChangePasswordOTP: () => Promise<void>;
+  changePassword: (currentPassword: string, newPassword: string, confirmPassword: string, otp: string) => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,55 +30,72 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const getTokenFromResponse = (response: any) =>
-    response?.data?.data?.token ||
-    response?.data?.token ||
-    response?.data?.data?.accessToken ||
-    response?.data?.accessToken ||
-    null;
+  const applySession = useCallback((token: string, userData: User) => {
+    setAccessToken(token);
+    setClientAccessToken(token);
+    setUser(userData);
+  }, []);
 
-  const getUserFromResponse = (response: any) =>
-    response?.data?.data?.user || response?.data?.user || null;
+  const clearSession = useCallback(() => {
+    setAccessToken(null);
+    setClientAccessToken('');
+    setUser(null);
+  }, []);
 
-  // Initialize and check current auth session
-  const checkAuth = async () => {
+  const fetchUserProfile = useCallback(async (): Promise<User | null> => {
     try {
-      // Hit refresh token endpoint on app load to auto login if valid cookie exists
-      const response = await apiClient.post('/auth/refresh-token');
-      const token = getTokenFromResponse(response);
-      const userData = getUserFromResponse(response);
-      
-      if (token && userData) {
-        setAccessToken(token);
-        setClientAccessToken(token);
-        setUser(userData);
-      }
-    } catch (error) {
-      // If refresh token fails on load, user is unauthenticated
-      setAccessToken(null);
-      setClientAccessToken('');
-      setUser(null);
+      const profileRes = await apiClient.get('/users/profile');
+      return normalizeUser(getUserFromResponse(profileRes) || profileRes.data?.user);
+    } catch {
+      return null;
+    }
+  }, []);
+
+  const restoreSessionFromRefresh = useCallback(async (): Promise<boolean> => {
+    const response = await apiClient.post('/auth/refresh-token');
+    const token = getTokenFromResponse(response);
+
+    if (!token) return false;
+
+    setClientAccessToken(token);
+    setAccessToken(token);
+
+    let userData = normalizeUser(getUserFromResponse(response));
+    if (!userData) {
+      userData = await fetchUserProfile();
+    }
+
+    if (!userData) return false;
+
+    setUser(userData);
+    return true;
+  }, [fetchUserProfile]);
+
+  const checkAuth = useCallback(async () => {
+    try {
+      await restoreSessionFromRefresh();
+    } catch {
+      clearSession();
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [restoreSessionFromRefresh, clearSession]);
 
   useEffect(() => {
     checkAuth();
-    
-    // Listen to token updates from silent refreshes inside apiClient
+
     const handleTokenRefreshed = (e: Event) => {
       const customEvent = e as CustomEvent<{ token: string; user?: User }>;
       const { token, user: refreshedUser } = customEvent.detail;
       setAccessToken(token);
+      setClientAccessToken(token);
       if (refreshedUser) {
         setUser(refreshedUser);
       }
     };
 
     const handleSessionExpired = () => {
-      setAccessToken(null);
-      setUser(null);
+      clearSession();
     };
 
     window.addEventListener('auth:token-refreshed', handleTokenRefreshed);
@@ -81,7 +105,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       window.removeEventListener('auth:token-refreshed', handleTokenRefreshed);
       window.removeEventListener('auth:session-expired', handleSessionExpired);
     };
-  }, []);
+  }, [checkAuth, clearSession]);
 
   const register = async (name: string, email: string, password: string, confirmPassword: string) => {
     await apiClient.post('/auth/register', { name, email, password, confirmPassword });
@@ -90,12 +114,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const verifyOTP = async (email: string, otp: string) => {
     const response = await apiClient.post('/auth/verify-otp', { email, otp });
     const token = getTokenFromResponse(response);
-    const userData = getUserFromResponse(response);
-    
+    const userData = normalizeUser(getUserFromResponse(response));
+
     if (token && userData) {
-      setAccessToken(token);
-      setClientAccessToken(token);
-      setUser(userData);
+      applySession(token, userData);
     }
   };
 
@@ -106,12 +128,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const login = async (email: string, password: string) => {
     const response = await apiClient.post('/auth/login', { email, password });
     const token = getTokenFromResponse(response);
-    const userData = getUserFromResponse(response);
-    
+    const userData = normalizeUser(getUserFromResponse(response));
+
     if (token && userData) {
-      setAccessToken(token);
-      setClientAccessToken(token);
-      setUser(userData);
+      applySession(token, userData);
     }
   };
 
@@ -119,9 +139,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await apiClient.post('/auth/logout');
     } finally {
-      setAccessToken(null);
-      setClientAccessToken('');
-      setUser(null);
+      clearSession();
     }
   };
 
@@ -131,6 +149,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const resetPassword = async (email: string, otp: string, newPassword: string) => {
     await apiClient.post('/auth/reset-password', { email, otp, newPassword });
+  };
+
+  const requestChangePasswordOTP = async () => {
+    await apiClient.post('/auth/change-password/request-otp');
+  };
+
+  const changePassword = async (
+    currentPassword: string,
+    newPassword: string,
+    confirmPassword: string,
+    otp: string
+  ) => {
+    await apiClient.post('/auth/change-password', {
+      currentPassword,
+      newPassword,
+      confirmPassword,
+      otp,
+    });
+    clearSession();
   };
 
   return (
@@ -147,6 +184,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         logout,
         forgotPassword,
         resetPassword,
+        requestChangePasswordOTP,
+        changePassword,
       }}
     >
       {children}

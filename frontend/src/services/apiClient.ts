@@ -1,4 +1,9 @@
 import axios from 'axios';
+import {
+  getTokenFromResponse,
+  getUserFromResponse,
+  normalizeUser,
+} from '../utils/authSession';
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
 
@@ -11,17 +16,49 @@ const apiClient = axios.create({
 });
 
 let accessToken = '';
+let refreshPromise: Promise<string | null> | null = null;
 
 export const setClientAccessToken = (token: string) => {
   accessToken = token;
 };
 
-const getTokenFromResponse = (response: any) =>
-  response?.data?.data?.token ||
-  response?.data?.token ||
-  response?.data?.data?.accessToken ||
-  response?.data?.accessToken ||
-  null;
+export const getClientAccessToken = () => accessToken;
+
+/** Single in-flight refresh so parallel 401s don't rotate the cookie multiple times */
+const refreshAccessToken = async (): Promise<string | null> => {
+  if (refreshPromise) {
+    return refreshPromise;
+  }
+
+  refreshPromise = (async () => {
+    try {
+      const response = await axios.post(
+        `${API_URL}/auth/refresh-token`,
+        {},
+        { withCredentials: true }
+      );
+
+      const newToken = getTokenFromResponse(response);
+      const user = normalizeUser(getUserFromResponse(response));
+
+      if (!newToken) return null;
+
+      setClientAccessToken(newToken);
+
+      window.dispatchEvent(
+        new CustomEvent('auth:token-refreshed', {
+          detail: { token: newToken, user: user || undefined },
+        })
+      );
+
+      return newToken;
+    } finally {
+      refreshPromise = null;
+    }
+  })();
+
+  return refreshPromise;
+};
 
 // Request interceptor to attach JWT
 apiClient.interceptors.request.use(
@@ -39,52 +76,34 @@ apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    
-    // Check if error is 401, not already retried, and not a login/logout/refresh endpoint
+
+    const isAuthEndpoint =
+      originalRequest?.url?.includes('/auth/login') ||
+      originalRequest?.url?.includes('/auth/logout') ||
+      originalRequest?.url?.includes('/auth/register') ||
+      originalRequest?.url?.includes('/auth/refresh-token');
+
     if (
       error.response?.status === 401 &&
       originalRequest &&
       !originalRequest._retry &&
-      !originalRequest.url?.includes('/auth/login') &&
-      !originalRequest.url?.includes('/auth/refresh-token')
+      !isAuthEndpoint
     ) {
       originalRequest._retry = true;
+
       try {
-        // Request token refresh
-        const response = await axios.post(
-          `${API_URL}/auth/refresh-token`,
-          {},
-          { withCredentials: true }
-        );
-        
-        // Extract token. In our backend sendSuccess structure, it is in response.data.data
-        const newToken = getTokenFromResponse(response);
-        const user = response.data?.data?.user || response.data?.user;
-        
-        if (newToken) {
-          setClientAccessToken(newToken);
-          
-          if (originalRequest.headers) {
-            originalRequest.headers.Authorization = `Bearer ${newToken}`;
-          }
-          
-          // Notify AuthContext that the token was refreshed
-          window.dispatchEvent(
-            new CustomEvent('auth:token-refreshed', { 
-              detail: { token: newToken, user } 
-            })
-          );
-          
+        const newToken = await refreshAccessToken();
+
+        if (newToken && originalRequest.headers) {
+          originalRequest.headers.Authorization = `Bearer ${newToken}`;
           return apiClient(originalRequest);
         }
-      } catch (refreshError) {
-        // Refresh token failed or cookie expired
+      } catch {
         setClientAccessToken('');
         window.dispatchEvent(new CustomEvent('auth:session-expired'));
-        return Promise.reject(refreshError);
       }
     }
-    
+
     return Promise.reject(error);
   }
 );

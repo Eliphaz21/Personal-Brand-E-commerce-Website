@@ -14,7 +14,8 @@ export const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   // Where to redirect after login (customers → shop, admins can still use store)
-  const fromPath = (location.state as { from?: { pathname?: string } })?.from?.pathname;
+  const fromPath = (location.state as { from?: { pathname?: string }; message?: string })?.from?.pathname;
+  const successMessage = (location.state as { message?: string })?.message || '';
   const defaultRedirect = '/shop';
   const from = fromPath && fromPath !== '/login' && fromPath !== '/register' ? fromPath : defaultRedirect;
 
@@ -45,6 +46,24 @@ export const Login: React.FC = () => {
           <h1 style={{ fontSize: '2rem', color: 'var(--color-primary-dark)', marginBottom: '0.5rem' }}>Welcome Back</h1>
           <p style={{ color: 'var(--color-text-muted)', fontSize: '0.95rem' }}>Sign in to continue your wellness journey</p>
         </div>
+
+        {successMessage && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.75rem',
+            padding: '1rem',
+            borderRadius: '12px',
+            backgroundColor: 'rgba(39, 174, 96, 0.08)',
+            border: '1px solid rgba(39, 174, 96, 0.2)',
+            marginBottom: '1.5rem',
+            color: 'var(--color-success)',
+            fontSize: '0.85rem',
+            fontWeight: 500,
+          }}>
+            {successMessage}
+          </div>
+        )}
 
         {error && (
           <div style={errorContainerStyle}>

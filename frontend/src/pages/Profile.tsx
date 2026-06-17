@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import apiClient from '../services/apiClient';
 import type { Order } from '../types';
 import {
   User, Mail, Shield, CheckCircle, Package, Clock,
   Edit2, Save, X, Loader, AlertCircle, ShoppingBag,
-  Truck, XCircle
+  Truck, XCircle, LogOut, KeyRound
 } from 'lucide-react';
 
 type ProfileTab = 'account' | 'orders';
@@ -25,7 +25,8 @@ const ORDER_STATUS_CONFIG: Record<string, { label: string; color: string; icon: 
 };
 
 export const Profile: React.FC = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<ProfileTab>('account');
   const [orders, setOrders] = useState<Order[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
@@ -71,6 +72,15 @@ export const Profile: React.FC = () => {
       setSaveSuccess('');
     }
     setEditing(!editing);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/login', { replace: true });
+    } catch (err) {
+      console.error('Logout failed:', err);
+    }
   };
 
   const handleSaveProfile = async (e: React.FormEvent) => {
@@ -286,6 +296,27 @@ export const Profile: React.FC = () => {
               ))}
             </tbody>
           </table>
+
+          <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid var(--color-border)' }}>
+            <h4 style={{ color: 'var(--color-primary-dark)', marginBottom: '1rem', fontSize: '1rem' }}>Security & Session</h4>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
+              <Link
+                to="/profile/change-password"
+                className="btn btn-outline"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', textDecoration: 'none' }}
+              >
+                <KeyRound size={16} /> Change Password
+              </Link>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="btn btn-outline"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-error)', borderColor: 'rgba(235,87,87,0.35)' }}
+              >
+                <LogOut size={16} /> Sign Out
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

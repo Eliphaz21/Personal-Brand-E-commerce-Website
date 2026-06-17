@@ -72,6 +72,10 @@ export const resetPasswordSchema = z.object({
 // ─── Change Password ──────────────────────────────────────────────────────────
 export const changePasswordSchema = z.object({
   body: z.object({
+    otp: z
+      .string({ required_error: 'Verification code is required' })
+      .length(6, 'OTP must be exactly 6 digits')
+      .regex(/^\d+$/, 'OTP must contain only digits'),
     currentPassword: z.string().min(1, 'Current password is required'),
     newPassword: passwordSchema,
     confirmPassword: z.string(),
