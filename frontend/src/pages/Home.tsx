@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useCart } from '../hooks/useCart';
 import apiClient from '../services/apiClient';
 import type { Product } from '../types';
-import { Star, ArrowRight, Heart, Sparkles, ShoppingCart, CheckCircle } from 'lucide-react';
+import { Star, ArrowRight, Heart, Sparkles, ShoppingCart, CheckCircle, Award } from 'lucide-react';
 
 export const Home: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -571,13 +571,6 @@ const discountBadgeStyle: React.CSSProperties = {
   padding: '0.25rem 0.6rem',
   borderRadius: '4px',
   zIndex: 3
-};
-
-const testimonialCardStyle: React.CSSProperties = {
-  padding: '2.5rem 2rem',
-  background: 'rgba(255, 255, 255, 0.65)',
-  border: '1px solid rgba(255, 255, 255, 0.4)',
-  borderRadius: '16px'
 };
 
 const ctaSectionStyle: React.CSSProperties = {

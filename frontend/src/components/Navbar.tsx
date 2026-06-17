@@ -1,10 +1,23 @@
 import React from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { User, Search } from 'lucide-react';
+import { useCart } from '../hooks/useCart';
+import { ShoppingBag, Package, User, LogOut, LayoutDashboard } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
-  const { isAuthenticated } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
+  const { totalItemsCount } = useCart();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (err) {
+      console.error('Logout failed:', err);
+    }
+  };
+
+  const navLinkClass = ({ isActive }: { isActive: boolean }) =>
+    `nav-link${isActive ? ' active' : ''}`;
 
   return (
     <header style={{
@@ -17,7 +30,6 @@ export const Navbar: React.FC = () => {
       padding: '12px 0'
     }}>
       <div className="container" style={{ display: 'flex', justifyContent: 'center' }}>
-        {/* Pill-shaped nav bar centered, with rounded corners like the image */}
         <div style={{
           width: '100%',
           maxWidth: 1150,
@@ -30,33 +42,77 @@ export const Navbar: React.FC = () => {
           boxShadow: '0 8px 24px rgba(0,0,0,0.08)',
           border: '1px solid rgba(61,43,31,0.12)'
         }}>
-          {/* Left area: company name */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', minWidth: 180 }}>
-            <Link to="/" style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', fontWeight: 700, color: '#3D2B1F', letterSpacing: '0.04em' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', minWidth: 120 }}>
+            <Link to="/" style={{ fontFamily: 'var(--font-heading)', fontSize: '1.25rem', fontWeight: 700, color: '#3D2B1F', letterSpacing: '0.04em', textDecoration: 'none' }}>
               Kiduendu
             </Link>
           </div>
 
-          {/* Center nav links */}
-          <nav style={{ display: 'flex', gap: '2rem', alignItems: 'center', justifyContent: 'center', flex: 1 }} aria-label="Primary navigation">
-            <NavLink to="/" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`} style={{ ...navLinkStyle, fontSize: '0.95rem', color: '#3D2B1F' }}>Home</NavLink>
-            <NavLink to="/about" style={{ ...navLinkStyle, fontSize: '0.95rem', color: '#3D2B1F' }}>About Company</NavLink>
+          <nav className="navbar-links" style={{ display: 'flex', gap: '1.25rem', alignItems: 'center', justifyContent: 'center', flex: 1 }} aria-label="Primary navigation">
+            <NavLink to="/" end className={navLinkClass} style={navLinkStyle}>Home</NavLink>
+            <NavLink to="/shop" className={navLinkClass} style={navLinkStyle}>Shop</NavLink>
+            <NavLink to="/about" className={navLinkClass} style={navLinkStyle}>About</NavLink>
+
+            {isAuthenticated && (
+              <>
+                <NavLink to="/cart" className={navLinkClass} style={{ ...navLinkStyle, display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <ShoppingBag size={15} />
+                  Cart
+                  {totalItemsCount > 0 && (
+                    <span style={{
+                      minWidth: '18px',
+                      height: '18px',
+                      padding: '0 5px',
+                      borderRadius: '999px',
+                      backgroundColor: 'var(--color-secondary)',
+                      color: '#fff',
+                      fontSize: '0.7rem',
+                      fontWeight: 700,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      lineHeight: 1
+                    }}>
+                      {totalItemsCount > 99 ? '99+' : totalItemsCount}
+                    </span>
+                  )}
+                </NavLink>
+                <NavLink to="/orders" className={navLinkClass} style={{ ...navLinkStyle, display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
+                  <Package size={15} />
+                  Orders
+                </NavLink>
+              </>
+            )}
           </nav>
 
-          {/* Right area: search, cart, auth */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', minWidth: 160, justifyContent: 'flex-end' }}>
-            <Link to="/search" aria-label="Search" style={{ color: '#3D2B1F', display: 'flex', alignItems: 'center' }}>
-              <Search size={18} />
-            </Link>
-
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', minWidth: 120, justifyContent: 'flex-end' }}>
             {isAuthenticated ? (
-              <Link to="/profile" style={{ display: 'flex', alignItems: 'center', color: '#FFE4C4' }}>
-                <User size={18} />
-              </Link>
+              <>
+                {user?.role === 'admin' && (
+                  <Link
+                    to="/admin"
+                    title="Admin Dashboard"
+                    style={{ ...iconButtonStyle, color: '#3D2B1F' }}
+                  >
+                    <LayoutDashboard size={18} />
+                  </Link>
+                )}
+                <Link to="/profile" title="My Account" style={{ ...iconButtonStyle, color: '#3D2B1F' }}>
+                  <User size={18} />
+                </Link>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  title="Sign out"
+                  style={{ ...iconButtonStyle, background: 'none', border: 'none', cursor: 'pointer', color: '#3D2B1F' }}
+                >
+                  <LogOut size={18} />
+                </button>
+              </>
             ) : (
               <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <Link to="/login" className="btn" style={{ padding: '0.35rem 0.7rem', background: 'transparent', color: '#3D2B1F', border: '1px solid rgba(61,43,31,0.15)', borderRadius: 10, fontWeight: 700 }}>Login</Link>
-                <Link to="/register" className="btn" style={{ padding: '0.35rem 0.7rem', background: '#3D2B1F', color: '#FFE4C4', borderRadius: 10, fontWeight: 700 }}>Register</Link>
+                <Link to="/login" className="btn" style={{ padding: '0.35rem 0.7rem', background: 'transparent', color: '#3D2B1F', border: '1px solid rgba(61,43,31,0.15)', borderRadius: 10, fontWeight: 700, textDecoration: 'none' }}>Login</Link>
+                <Link to="/register" className="btn" style={{ padding: '0.35rem 0.7rem', background: '#3D2B1F', color: '#FFE4C4', borderRadius: 10, fontWeight: 700, textDecoration: 'none' }}>Register</Link>
               </div>
             )}
           </div>
@@ -65,23 +121,31 @@ export const Navbar: React.FC = () => {
 
       <style>{`
         @media (max-width: 900px) {
-          .container { padding: 0 1rem; }
-          nav { display: none; }
+          .navbar-links { display: none !important; }
         }
       `}</style>
     </header>
   );
 };
 
-const navLinkStyle = {
+const navLinkStyle: React.CSSProperties = {
   fontFamily: 'var(--font-heading)',
   fontWeight: 500,
-  color: 'var(--color-primary-dark)',
+  color: '#3D2B1F',
   padding: '0.5rem 0',
-  position: 'relative' as const,
-  transition: 'color var(--transition-fast)'
+  position: 'relative',
+  transition: 'color var(--transition-fast)',
+  textDecoration: 'none',
+  fontSize: '0.95rem'
 };
 
-// (Unused helper styles removed to avoid TypeScript unused-variable warnings)
+const iconButtonStyle: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '0.35rem',
+  borderRadius: '8px',
+  textDecoration: 'none'
+};
 
 export default Navbar;

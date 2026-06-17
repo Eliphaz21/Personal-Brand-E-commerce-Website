@@ -6,6 +6,19 @@ import apiClient from '../services/apiClient';
 import type { Product } from '../types';
 import { Star, Search, SlidersHorizontal, ArrowUpDown, ShoppingCart, CheckCircle, HelpCircle } from 'lucide-react';
 
+const normalizeSortParam = (value: string | null): string => {
+  const legacyMap: Record<string, string> = {
+    '-createdAt': 'newest',
+    price: 'price_asc',
+    '-price': 'price_desc',
+    '-rating': 'top_rated',
+  };
+  const allowed = new Set(['newest', 'price_asc', 'price_desc', 'top_rated', 'best_selling']);
+  if (!value) return 'newest';
+  if (legacyMap[value]) return legacyMap[value];
+  return allowed.has(value) ? value : 'newest';
+};
+
 export const ProductCatalog: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const { addToCart } = useCart();
@@ -23,7 +36,7 @@ export const ProductCatalog: React.FC = () => {
   const [minPrice, setMinPrice] = useState(searchParams.get('minPrice') || '');
   const [maxPrice, setMaxPrice] = useState(searchParams.get('maxPrice') || '');
   const [inStock, setInStock] = useState(searchParams.get('inStock') === 'true');
-  const [sort, setSort] = useState(searchParams.get('sort') || '-createdAt');
+  const [sort, setSort] = useState(() => normalizeSortParam(searchParams.get('sort')));
 
   // UI state
   const [addingId, setAddingId] = useState<string | null>(null);
@@ -130,7 +143,7 @@ export const ProductCatalog: React.FC = () => {
     setMinPrice('');
     setMaxPrice('');
     setInStock(false);
-    setSort('-createdAt');
+    setSort('newest');
   };
 
   return (
@@ -167,10 +180,10 @@ export const ProductCatalog: React.FC = () => {
               className="form-input"
               style={{ padding: '0.75rem 1rem' }}
             >
-              <option value="-createdAt">Newest Additions</option>
-              <option value="price">Price: Low to High</option>
-              <option value="-price">Price: High to Low</option>
-              <option value="-rating">Customer Ratings</option>
+              <option value="newest">Newest Additions</option>
+              <option value="price_asc">Price: Low to High</option>
+              <option value="price_desc">Price: High to Low</option>
+              <option value="top_rated">Customer Ratings</option>
             </select>
           </div>
 

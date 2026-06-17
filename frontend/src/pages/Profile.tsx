@@ -29,6 +29,7 @@ export const Profile: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ProfileTab>('account');
   const [orders, setOrders] = useState<Order[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
+  const [ordersError, setOrdersError] = useState('');
 
   const [editing, setEditing] = useState(false);
   const [editForm, setEditForm] = useState<ProfileEditForm>({ name: user?.name || '', bio: '' });
@@ -38,21 +39,26 @@ export const Profile: React.FC = () => {
 
   // Fetch orders when switching to orders tab
   useEffect(() => {
-    if (activeTab === 'orders' && orders.length === 0) {
+    if (activeTab === 'orders') {
       fetchOrders();
     }
   }, [activeTab]);
 
   const fetchOrders = async () => {
     setOrdersLoading(true);
+    setOrdersError('');
     try {
       const res = await apiClient.get('/orders/myorders');
       const fetchedOrders = res.data?.orders || res.data?.data?.orders || [];
       setOrders(fetchedOrders);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to fetch orders:', err);
-      // Show demo orders if not connected
-      setOrders(demoOrders);
+      setOrders([]);
+      setOrdersError(
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        'Unable to load your orders.'
+      );
     } finally {
       setOrdersLoading(false);
     }
@@ -92,26 +98,6 @@ export const Profile: React.FC = () => {
       setSaving(false);
     }
   };
-
-  // Demo order data to show layout when backend is empty
-  const demoOrders: Order[] = [
-    {
-      _id: 'ord-demo-1',
-      userId: user?.id as any || 'user-1',
-      items: [
-        { productId: 'mock-1', title: 'OvaBoost Max (Egg Quality Support)', price: 49.99, qty: 1, image: 'https://images.unsplash.com/photo-1584017911766-d451b3d0e843?auto=format&fit=crop&q=80&w=200' }
-      ],
-      shippingAddress: { address: '123 Wellness Blvd', city: 'New York', postalCode: '10001', country: 'United States' },
-      subtotal: 49.99,
-      tax: 4.00,
-      shippingCost: 0,
-      discount: 0,
-      totalPrice: 53.99,
-      paymentStatus: 'paid',
-      orderStatus: 'processing',
-      createdAt: new Date(Date.now() - 86400000 * 3).toISOString()
-    }
-  ];
 
   const initials = user?.name
     ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
@@ -321,7 +307,17 @@ export const Profile: React.FC = () => {
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              {orders.map(order => {
+              {ordersError && (
+                <div style={{ padding: '1rem', borderRadius: '10px', backgroundColor: 'rgba(235,87,87,0.08)', color: 'var(--color-error)', fontSize: '0.9rem' }}>
+                  {ordersError}
+                </div>
+              )}
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Link to="/orders" style={{ color: 'var(--color-secondary)', fontWeight: 600, fontSize: '0.9rem' }}>
+                  View all orders →
+                </Link>
+              </div>
+              {orders.slice(0, 5).map(order => {
                 const statusKey = order.orderStatus?.toLowerCase() || 'pending';
                 const statusConfig = ORDER_STATUS_CONFIG[statusKey] || ORDER_STATUS_CONFIG.pending;
 
@@ -360,7 +356,7 @@ export const Profile: React.FC = () => {
                     </div>
 
                     {/* Order Items */}
-                    <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
                       {order.items?.map((item, idx) => (
                         <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 0.75rem', borderRadius: '8px', backgroundColor: 'var(--color-bg-main)', border: '1px solid var(--color-border)', flex: '1 1 auto', minWidth: '200px', maxWidth: '360px' }}>
                           {item.image && (
@@ -379,6 +375,12 @@ export const Profile: React.FC = () => {
                         </div>
                       ))}
                     </div>
+                    <Link
+                      to={`/orders/${order._id}`}
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: 'var(--color-secondary)', fontWeight: 600, fontSize: '0.85rem', textDecoration: 'none' }}
+                    >
+                      View full order details →
+                    </Link>
                   </div>
                 );
               })}

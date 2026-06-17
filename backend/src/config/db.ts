@@ -5,7 +5,8 @@ const connectDB = async (): Promise<void> => {
   try {
     const conn = await mongoose.connect(env.MONGO_URI, {
       // Mongoose 6+ uses these by default but being explicit
-      serverSelectionTimeoutMS: 5000,
+      // Atlas can take 10–15s on first connect over slow networks; 5s was too aggressive
+      serverSelectionTimeoutMS: 30000,
       socketTimeoutMS: 45000,
     });
 

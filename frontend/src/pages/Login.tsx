@@ -13,8 +13,10 @@ export const Login: React.FC = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Where to redirect after login (default to Home)
-  const from = (location.state as any)?.from?.pathname || '/';
+  // Where to redirect after login (customers → shop, admins can still use store)
+  const fromPath = (location.state as { from?: { pathname?: string } })?.from?.pathname;
+  const defaultRedirect = '/shop';
+  const from = fromPath && fromPath !== '/login' && fromPath !== '/register' ? fromPath : defaultRedirect;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
