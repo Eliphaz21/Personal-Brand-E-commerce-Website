@@ -203,3 +203,76 @@ export const sendContactReplyEmail = async (
     html: getHtmlLayout(content),
   });
 };
+
+/**
+ * Welcome email after newsletter subscription.
+ */
+export const sendNewsletterWelcomeEmail = async (email: string, name: string): Promise<void> => {
+  const content = `
+    <h2>Welcome to the KidEnDu Wellness Digest!</h2>
+    <p>Hello ${name},</p>
+    <p>Thank you for subscribing to Coach Kidist's weekly wellness updates. You'll receive fertility tips, egg quality nutrition guides, recipes, and exclusive discount codes.</p>
+    <p>You can also send a personal message directly to Coach Kidist from our website after subscribing — replies will arrive in this inbox.</p>
+    <br>
+    <p>Warm regards,<br>Coach Kidist & The KidEnDu Team</p>
+  `;
+
+  await transporter.sendMail({
+    from: `"${env.EMAIL_FROM_NAME || 'KidEnDu'}" <${env.EMAIL_FROM}>`,
+    to: email,
+    subject: '🌿 Welcome to the KidEnDu Hormone Blueprint Digest',
+    html: getHtmlLayout(content),
+  });
+};
+
+/**
+ * Confirmation email when a subscriber sends a message to admin.
+ */
+export const sendNewsletterMessageConfirmationEmail = async (
+  email: string,
+  name: string,
+  subject: string
+): Promise<void> => {
+  const content = `
+    <h2>We received your message</h2>
+    <p>Hello ${name},</p>
+    <p>Your message "<strong>${subject}</strong>" was delivered to Coach Kidist. You'll receive a reply at this email address once it's reviewed.</p>
+    <br>
+    <p>Warm regards,<br>The KidEnDu Team</p>
+  `;
+
+  await transporter.sendMail({
+    from: `"${env.EMAIL_FROM_NAME || 'KidEnDu'}" <${env.EMAIL_FROM}>`,
+    to: email,
+    subject: '✓ Your message to Coach Kidist was received',
+    html: getHtmlLayout(content),
+  });
+};
+
+/**
+ * Broadcast email sent by admin to all newsletter subscribers.
+ */
+export const sendNewsletterBroadcastEmail = async (
+  email: string,
+  name: string,
+  subject: string,
+  body: string
+): Promise<void> => {
+  const content = `
+    <h2>${subject}</h2>
+    <p>Hello ${name},</p>
+    <div style="background-color: rgba(201, 159, 153, 0.08); padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #c99f99;">
+      <p style="margin: 0; white-space: pre-wrap;">${body}</p>
+    </div>
+    <p style="font-size: 14px; color: #a5975b;">You are receiving this because you subscribed to the KidEnDu wellness digest.</p>
+    <br>
+    <p>Warm regards,<br>Coach Kidist & The KidEnDu Team</p>
+  `;
+
+  await transporter.sendMail({
+    from: `"${env.EMAIL_FROM_NAME || 'KidEnDu'}" <${env.EMAIL_FROM}>`,
+    to: email,
+    subject,
+    html: getHtmlLayout(content),
+  });
+};

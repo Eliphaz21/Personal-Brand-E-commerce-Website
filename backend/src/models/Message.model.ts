@@ -7,6 +7,7 @@ export interface IMessage extends Document {
   subject: string;
   body: string;
   isDirectMessage: boolean; // true = authenticated DM; false = contact form
+  messageType: 'contact' | 'newsletter';
   status: 'unread' | 'read' | 'replied';
   adminReply: string;
   repliedAt: Date | undefined;
@@ -48,6 +49,11 @@ const messageSchema = new Schema<IMessage>(
       type: Boolean,
       default: false,
     },
+    messageType: {
+      type: String,
+      enum: ['contact', 'newsletter'],
+      default: 'contact',
+    },
     status: {
       type: String,
       enum: ['unread', 'read', 'replied'],
@@ -67,6 +73,7 @@ const messageSchema = new Schema<IMessage>(
 
 messageSchema.index({ status: 1, createdAt: -1 });
 messageSchema.index({ fromUserId: 1 });
+messageSchema.index({ messageType: 1, createdAt: -1 });
 
 const Message: Model<IMessage> = mongoose.model<IMessage>('Message', messageSchema);
 export default Message;

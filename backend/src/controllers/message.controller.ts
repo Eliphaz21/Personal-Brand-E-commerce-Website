@@ -57,6 +57,9 @@ export const getMessages = catchAsync(async (req: Request, res: Response) => {
   if (req.query.status) {
     filter.status = req.query.status;
   }
+  if (req.query.type === 'newsletter' || req.query.type === 'contact') {
+    filter.messageType = req.query.type;
+  }
 
   const messages = await Message.find(filter)
     .sort({ createdAt: -1 })
