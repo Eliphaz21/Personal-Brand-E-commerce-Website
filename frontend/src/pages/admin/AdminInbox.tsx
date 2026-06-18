@@ -8,7 +8,10 @@ import {
   AlertCircle,
   CheckCircle,
   Clock,
-  Inbox
+  Inbox,
+  Users,
+  Megaphone,
+  Mail
 } from 'lucide-react';
 
 interface SupportMessage {
@@ -17,6 +20,7 @@ interface SupportMessage {
   guestEmail: string;
   subject: string;
   body: string;
+  messageType?: 'contact' | 'newsletter';
   status: 'unread' | 'read' | 'replied';
   createdAt: string;
   adminReply?: string;
@@ -29,8 +33,24 @@ interface SupportMessage {
   };
 }
 
+interface NewsletterSubscriber {
+  _id: string;
+  email: string;
+  name: string;
+  isActive: boolean;
+  subscribedAt: string;
+}
+
+interface NewsletterStats {
+  activeSubscribers: number;
+  unreadNewsletterMessages: number;
+  totalNewsletterMessages: number;
+}
+
 export const AdminInbox: React.FC = () => {
   const [messages, setMessages] = useState<SupportMessage[]>([]);
+  const [subscribers, setSubscribers] = useState<NewsletterSubscriber[]>([]);
+  const [stats, setStats] = useState<NewsletterStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
@@ -38,6 +58,15 @@ export const AdminInbox: React.FC = () => {
   // Search & Filter
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [typeFilter, setTypeFilter] = useState('');
+
+  // Broadcast state
+  const [showBroadcast, setShowBroadcast] = useState(false);
+  const [showSubscribers, setShowSubscribers] = useState(false);
+  const [broadcastSubject, setBroadcastSubject] = useState('');
+  const [broadcastBody, setBroadcastBody] = useState('');
+  const [submittingBroadcast, setSubmittingBroadcast] = useState(false);
+  const [broadcastError, setBroadcastError] = useState('');
 
   // Selected Message & Reply State
   const [selectedMessage, setSelectedMessage] = useState<SupportMessage | null>(null);
@@ -49,14 +78,18 @@ export const AdminInbox: React.FC = () => {
     setLoading(true);
     try {
       setError('');
-      const res = await apiClient.get('/messages?limit=50');
+      const params: Record<string, string | number> = { limit: 50 };
+      if (typeFilter) params.type = typeFilter;
+
+      const res = await apiClient.get('/messages', { params });
       const data = res.data?.data?.messages || res.data?.messages || [];
       setMessages(data);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error fetching admin messages:', err);
       setMessages([]);
+      const axiosErr = err as { response?: { data?: { message?: string } } };
       setError(
-        err.response?.data?.message ||
+        axiosErr.response?.data?.message ||
         'Could not retrieve support messages. Please try again.'
       );
     } finally {
@@ -64,9 +97,61 @@ export const AdminInbox: React.FC = () => {
     }
   };
 
+  const fetchNewsletterData = async () => {
+    try {
+      const [statsRes, subsRes] = await Promise.all([
+        apiClient.get('/newsletter/stats'),
+        apiClient.get('/newsletter/subscribers', { params: { limit: 100, active: true } }),
+      ]);
+      setStats(statsRes.data?.data || statsRes.data || null);
+      setSubscribers(subsRes.data?.data?.subscribers || subsRes.data?.subscribers || []);
+    } catch (err) {
+      console.error('Error fetching newsletter data:', err);
+    }
+  };
+
   useEffect(() => {
     fetchMessages();
+  }, [typeFilter]);
+
+  useEffect(() => {
+    fetchNewsletterData();
   }, []);
+
+  const handleBroadcastSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!broadcastSubject.trim() || !broadcastBody.trim()) {
+      setBroadcastError('Subject and message are required.');
+      return;
+    }
+
+    if (!window.confirm(`Send this newsletter to ${stats?.activeSubscribers || subscribers.length} active subscribers?`)) {
+      return;
+    }
+
+    setBroadcastError('');
+    setSubmittingBroadcast(true);
+
+    try {
+      const res = await apiClient.post('/newsletter/broadcast', {
+        subject: broadcastSubject.trim(),
+        body: broadcastBody.trim(),
+      });
+
+      const sentCount = res.data?.data?.sentCount || stats?.activeSubscribers || 0;
+      setSuccessMsg(`Newsletter sent to ${sentCount} subscriber${sentCount !== 1 ? 's' : ''} via email.`);
+      setBroadcastSubject('');
+      setBroadcastBody('');
+      setShowBroadcast(false);
+      setTimeout(() => setSuccessMsg(''), 5000);
+      fetchNewsletterData();
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { message?: string } } };
+      setBroadcastError(axiosErr.response?.data?.message || 'Failed to send broadcast. Check SMTP settings.');
+    } finally {
+      setSubmittingBroadcast(false);
+    }
+  };
 
   const handleSelectMessage = async (msg: SupportMessage) => {
     setSelectedMessage(msg);
@@ -163,14 +248,139 @@ export const AdminInbox: React.FC = () => {
     <div className="admin-inbox" style={{ display: 'flex', flexDirection: 'column', gap: '2rem', height: 'calc(100vh - 120px)' }}>
       
       {/* Header */}
-      <div>
-        <h1 style={{ fontSize: '2.25rem', fontWeight: 800, color: 'var(--color-primary-dark)', margin: 0 }}>
-          Support Inbox
-        </h1>
-        <p style={{ color: 'var(--color-text-muted)', marginTop: '0.25rem', fontSize: '0.95rem' }}>
-          Read client inquiries, view contact messages, and dispatch reply emails.
-        </p>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+        <div>
+          <h1 style={{ fontSize: '2.25rem', fontWeight: 800, color: 'var(--color-primary-dark)', margin: 0 }}>
+            Support Inbox
+          </h1>
+          <p style={{ color: 'var(--color-text-muted)', marginTop: '0.25rem', fontSize: '0.95rem' }}>
+            Newsletter subscriber messages, support inquiries, and email broadcasts.
+          </p>
+        </div>
+
+        {stats && (
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <div style={statPillStyle}>
+              <Users size={14} />
+              {stats.activeSubscribers} subscribers
+            </div>
+            <div style={{ ...statPillStyle, ...(stats.unreadNewsletterMessages > 0 ? { borderColor: 'var(--color-secondary)', color: 'var(--color-secondary)' } : {}) }}>
+              <Mail size={14} />
+              {stats.unreadNewsletterMessages} unread newsletter
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Admin actions: broadcast + subscribers */}
+      <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+        <button
+          type="button"
+          onClick={() => { setShowBroadcast(!showBroadcast); setShowSubscribers(false); }}
+          className="btn btn-primary"
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', padding: '0.6rem 1.1rem' }}
+        >
+          <Megaphone size={16} /> Email All Subscribers
+        </button>
+        <button
+          type="button"
+          onClick={() => { setShowSubscribers(!showSubscribers); setShowBroadcast(false); }}
+          className="btn btn-outline"
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem', padding: '0.6rem 1.1rem' }}
+        >
+          <Users size={16} /> View Subscribers ({subscribers.length})
+        </button>
+      </div>
+
+      {showBroadcast && (
+        <form onSubmit={handleBroadcastSubmit} className="glass-panel" style={{
+          padding: '1.5rem',
+          borderRadius: '16px',
+          border: '1px solid var(--color-border)',
+          background: 'rgba(255,255,255,0.85)',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '1rem',
+        }}>
+          <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--color-primary-dark)' }}>
+            Send Newsletter to All Active Subscribers
+          </h3>
+          <p style={{ margin: 0, fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
+            This sends an email to every subscribed user. They will receive it in their inbox.
+          </p>
+          {broadcastError && (
+            <div style={{ color: 'var(--color-error)', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <AlertCircle size={14} /> {broadcastError}
+            </div>
+          )}
+          <input
+            type="text"
+            placeholder="Email subject"
+            value={broadcastSubject}
+            onChange={(e) => setBroadcastSubject(e.target.value)}
+            className="form-input"
+            maxLength={200}
+            required
+          />
+          <textarea
+            placeholder="Write your wellness update, tips, recipes, or discount announcement..."
+            value={broadcastBody}
+            onChange={(e) => setBroadcastBody(e.target.value)}
+            className="form-input"
+            rows={5}
+            maxLength={10000}
+            required
+            style={{ resize: 'vertical' }}
+          />
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
+            <button type="button" className="btn btn-outline" onClick={() => setShowBroadcast(false)}>Cancel</button>
+            <button type="submit" disabled={submittingBroadcast} className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              {submittingBroadcast ? <Loader size={16} className="spin-animation" /> : <Send size={14} />}
+              Send to {stats?.activeSubscribers || subscribers.length} Subscribers
+            </button>
+          </div>
+        </form>
+      )}
+
+      {showSubscribers && (
+        <div className="glass-panel" style={{
+          padding: '1.5rem',
+          borderRadius: '16px',
+          border: '1px solid var(--color-border)',
+          background: 'rgba(255,255,255,0.85)',
+          maxHeight: '280px',
+          overflowY: 'auto',
+        }}>
+          <h3 style={{ margin: '0 0 1rem', fontSize: '1.1rem', color: 'var(--color-primary-dark)' }}>
+            Active Newsletter Subscribers
+          </h3>
+          {subscribers.length === 0 ? (
+            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem' }}>No subscribers yet.</p>
+          ) : (
+            <div style={{ display: 'grid', gap: '0.5rem' }}>
+              {subscribers.map((sub) => (
+                <div key={sub._id} style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '0.65rem 0.85rem',
+                  borderRadius: '8px',
+                  border: '1px solid var(--color-border)',
+                  fontSize: '0.85rem',
+                }}>
+                  <div>
+                    <strong>{sub.name || 'Subscriber'}</strong>
+                    <span style={{ color: 'var(--color-text-muted)', marginLeft: '0.5rem' }}>{sub.email}</span>
+                  </div>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
+                    {new Date(sub.subscribedAt).toLocaleDateString()}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {successMsg && (
         <div style={{
@@ -245,6 +455,34 @@ export const AdminInbox: React.FC = () => {
               />
             </div>
             
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              {[
+                { value: '', label: 'All' },
+                { value: 'newsletter', label: 'Newsletter' },
+                { value: 'contact', label: 'Support' },
+              ].map(({ value, label }) => (
+                <button
+                  key={value || 'all'}
+                  onClick={() => setTypeFilter(value)}
+                  style={{
+                    flex: 1,
+                    minWidth: '70px',
+                    padding: '0.35rem 0.5rem',
+                    borderRadius: '6px',
+                    border: '1px solid var(--color-border)',
+                    fontSize: '0.75rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    backgroundColor: typeFilter === value ? 'var(--color-secondary)' : '#fff',
+                    color: typeFilter === value ? '#fff' : 'var(--color-text-muted)',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
             <div style={{ display: 'flex', gap: '0.5rem' }}>
               {['', 'unread', 'read', 'replied'].map((st) => (
                 <button
@@ -333,8 +571,22 @@ export const AdminInbox: React.FC = () => {
                       </span>
                     </div>
 
-                    <div style={{ fontWeight: msg.status === 'unread' ? 700 : 500, fontSize: '0.825rem', color: 'var(--color-text-main)', marginBottom: '0.25rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {msg.subject}
+                    <div style={{ fontWeight: msg.status === 'unread' ? 700 : 500, fontSize: '0.825rem', color: 'var(--color-text-main)', marginBottom: '0.25rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                      {msg.messageType === 'newsletter' && (
+                        <span style={{
+                          fontSize: '0.6rem',
+                          fontWeight: 700,
+                          textTransform: 'uppercase',
+                          padding: '0.1rem 0.35rem',
+                          borderRadius: '4px',
+                          background: 'rgba(212, 163, 115, 0.2)',
+                          color: 'var(--color-secondary)',
+                          flexShrink: 0,
+                        }}>
+                          Newsletter
+                        </span>
+                      )}
+                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{msg.subject}</span>
                     </div>
 
                     <div style={{ fontSize: '0.775rem', color: 'var(--color-text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', lineHeight: '1.4' }}>
@@ -421,6 +673,21 @@ export const AdminInbox: React.FC = () => {
                     <div>
                       <h4 style={{ margin: 0, fontWeight: 700, fontSize: '0.975rem', color: 'var(--color-primary-dark)' }}>{selectedMessage.guestName}</h4>
                       <span style={{ fontSize: '0.775rem', color: 'var(--color-text-muted)' }}>From: {selectedMessage.guestEmail}</span>
+                      {selectedMessage.messageType === 'newsletter' && (
+                        <span style={{
+                          display: 'inline-block',
+                          marginTop: '0.35rem',
+                          fontSize: '0.7rem',
+                          fontWeight: 700,
+                          textTransform: 'uppercase',
+                          padding: '0.15rem 0.5rem',
+                          borderRadius: '4px',
+                          background: 'rgba(212, 163, 115, 0.2)',
+                          color: 'var(--color-secondary)',
+                        }}>
+                          Newsletter Subscriber
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -577,6 +844,19 @@ export const AdminInbox: React.FC = () => {
 
     </div>
   );
+};
+
+const statPillStyle: React.CSSProperties = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '0.4rem',
+  padding: '0.45rem 0.85rem',
+  borderRadius: '999px',
+  border: '1px solid var(--color-border)',
+  background: 'rgba(255,255,255,0.85)',
+  fontSize: '0.8rem',
+  fontWeight: 600,
+  color: 'var(--color-primary-dark)',
 };
 
 export default AdminInbox;

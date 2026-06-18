@@ -5,6 +5,28 @@ import { useCart } from '../hooks/useCart';
 import apiClient from '../services/apiClient';
 import type { Product } from '../types';
 import { Star, ArrowRight, Heart, Sparkles, ShoppingCart, CheckCircle, Award } from 'lucide-react';
+import NewsletterSubscribe from '../components/NewsletterSubscribe';
+
+const HOME_PRODUCT_LIMIT = 8;
+
+const parseProductsResponse = (res: { data?: { products?: Product[]; data?: { products?: Product[] } } }): Product[] => {
+  return res.data?.products || res.data?.data?.products || [];
+};
+
+const mergeUniqueProducts = (primary: Product[], secondary: Product[], limit: number): Product[] => {
+  const seen = new Set(primary.map((p) => p._id));
+  const merged = [...primary];
+
+  for (const product of secondary) {
+    if (merged.length >= limit) break;
+    if (!seen.has(product._id)) {
+      merged.push(product);
+      seen.add(product._id);
+    }
+  }
+
+  return merged;
+};
 
 export const Home: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -17,22 +39,31 @@ export const Home: React.FC = () => {
   const [successMsg, setSuccessMsg] = useState<{ [key: string]: boolean }>({});
 
   useEffect(() => {
-    const fetchFeaturedProducts = async () => {
+    const fetchHomeProducts = async () => {
       try {
-        const res = await apiClient.get('/products', {
-          params: { isFeatured: true, limit: 4 }
+        const featuredRes = await apiClient.get('/products', {
+          params: { isFeatured: true, limit: HOME_PRODUCT_LIMIT, sort: 'newest' },
         });
-        const fetchedData = res.data?.products || res.data?.data?.products || res.data?.data || [];
-        setProducts(fetchedData);
+        let homeProducts = parseProductsResponse(featuredRes);
+
+        if (homeProducts.length < HOME_PRODUCT_LIMIT) {
+          const catalogRes = await apiClient.get('/products', {
+            params: { limit: HOME_PRODUCT_LIMIT, sort: 'newest' },
+          });
+          const catalogProducts = parseProductsResponse(catalogRes);
+          homeProducts = mergeUniqueProducts(homeProducts, catalogProducts, HOME_PRODUCT_LIMIT);
+        }
+
+        setProducts(homeProducts);
       } catch (err) {
-        console.error('Failed to load featured products:', err);
+        console.error('Failed to load home products:', err);
         setProducts([]);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchFeaturedProducts();
+    fetchHomeProducts();
   }, []);
 
   const handleAddToCart = async (product: Product) => {
@@ -303,8 +334,8 @@ export const Home: React.FC = () => {
                       <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>({product.numReviews} reviews)</span>
                     </div>
 
-                    {/* Pricing & Cart Action */}
-                    <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    {/* Pricing & Actions */}
+                    <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                       <div>
                         <span style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--color-primary-dark)' }}>
                           ${product.price.toFixed(2)}
@@ -316,33 +347,54 @@ export const Home: React.FC = () => {
                         )}
                       </div>
 
-                      <button 
-                        onClick={() => handleAddToCart(product)}
-                        disabled={addingId === product._id || product.stock === 0}
-                        style={{
-                          background: successMsg[product._id] ? 'var(--color-success)' : 'var(--color-primary)',
-                          color: '#fff',
-                          border: 'none',
-                          borderRadius: '50%',
-                          width: '38px',
-                          height: '38px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          cursor: product.stock === 0 ? 'not-allowed' : 'pointer',
-                          boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
-                          transition: 'all 0.3s ease'
-                        }}
-                        title={product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
-                      >
-                        {successMsg[product._id] ? (
-                          <CheckCircle size={18} />
-                        ) : addingId === product._id ? (
-                          <div style={{ ...spinnerStyle, width: '16px', height: '16px', borderWidth: '2px' }} />
-                        ) : (
-                          <ShoppingCart size={18} />
-                        )}
-                      </button>
+                      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                        <Link
+                          to={`/product/${product.slug}`}
+                          className="btn btn-outline"
+                          style={{
+                            flex: 1,
+                            textAlign: 'center',
+                            fontSize: '0.85rem',
+                            padding: '0.5rem 0.75rem',
+                            textDecoration: 'none',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '0.35rem',
+                          }}
+                        >
+                          View Details <ArrowRight size={14} />
+                        </Link>
+
+                        <button
+                          onClick={() => handleAddToCart(product)}
+                          disabled={addingId === product._id || product.stock === 0}
+                          style={{
+                            background: successMsg[product._id] ? 'var(--color-success)' : 'var(--color-primary)',
+                            color: '#fff',
+                            border: 'none',
+                            borderRadius: '50%',
+                            width: '38px',
+                            height: '38px',
+                            flexShrink: 0,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            cursor: product.stock === 0 ? 'not-allowed' : 'pointer',
+                            boxShadow: '0 4px 10px rgba(0,0,0,0.1)',
+                            transition: 'all 0.3s ease',
+                          }}
+                          title={product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
+                        >
+                          {successMsg[product._id] ? (
+                            <CheckCircle size={18} />
+                          ) : addingId === product._id ? (
+                            <div style={{ ...spinnerStyle, width: '16px', height: '16px', borderWidth: '2px' }} />
+                          ) : (
+                            <ShoppingCart size={18} />
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -354,31 +406,7 @@ export const Home: React.FC = () => {
 
 
 
-      {/* ─── Newsletter Call to Action ──────────────────────────────────────── */}
-      <section style={ctaSectionStyle}>
-        <div className="container" style={{ position: 'relative', zIndex: 2, textAlign: 'center', maxWidth: '640px' }}>
-          <Sparkles size={32} color="var(--color-secondary)" style={{ marginBottom: '1.5rem', animation: 'float 3s ease-in-out infinite' }} />
-          <h2 style={{ fontSize: '2.5rem', color: 'var(--color-primary-dark)', marginBottom: '1rem' }}>Get Your Custom Hormone Blueprint</h2>
-          <p style={{ color: 'var(--color-text-muted)', marginBottom: '2.5rem' }}>
-            Subscribe to Coach Kidist's weekly wellness digests containing egg quality diets, fertility recipes, and discount codes.
-          </p>
-          <form 
-            onSubmit={(e) => { e.preventDefault(); alert('Thank you for subscribing! Check your inbox soon for your fertility guide.'); }}
-            style={{ display: 'flex', gap: '0.5rem', width: '100%', flexWrap: 'wrap' }}
-          >
-            <input 
-              type="email" 
-              placeholder="Enter your email address" 
-              required
-              className="form-input"
-              style={{ flex: 1, minWidth: '240px' }}
-            />
-            <button type="submit" className="btn btn-primary">
-              Subscribe Now
-            </button>
-          </form>
-        </div>
-      </section>
+      <NewsletterSubscribe />
 
       {/* CSS Styles for 3D interactions and animations */}
       <style>{`
@@ -571,16 +599,6 @@ const discountBadgeStyle: React.CSSProperties = {
   padding: '0.25rem 0.6rem',
   borderRadius: '4px',
   zIndex: 3
-};
-
-const ctaSectionStyle: React.CSSProperties = {
-  padding: '7rem 0',
-  background: 'linear-gradient(180deg, rgba(247, 246, 242, 0.2) 0%, rgba(227, 236, 227, 0.5) 100%)',
-  borderTop: '1px solid var(--color-border)',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  position: 'relative'
 };
 
 const spinnerStyle: React.CSSProperties = {
