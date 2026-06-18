@@ -86,15 +86,6 @@ const AboutCompany: React.FC = () => {
               >
                 Book Coaching <ArrowRight size={16} />
               </Link>
-              <a
-                href="https://stan.store/Kidisthab"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn btn-glass"
-                style={{ border: '1px solid var(--color-primary)' }}
-              >
-                Visit Stan Store
-              </a>
             </div>
 
             {/* Affiliate Links */}
@@ -158,6 +149,36 @@ const AboutCompany: React.FC = () => {
               >
                 <ShoppingBag size={16} />
                 Temu Affiliate
+              </a>
+              <a
+                href="https://www.tiktok.com/@kiduen?is_from_webapp=1&sender_device=pc"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  padding: '0.5rem 1rem',
+                  backgroundColor: '#000000',
+                  color: '#fff',
+                  borderRadius: '8px',
+                  textDecoration: 'none',
+                  fontSize: '0.85rem',
+                  fontWeight: 600,
+                  transition: 'all 0.3s ease',
+                  border: '1px solid #000000'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                  e.currentTarget.style.backgroundColor = '#333333';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.backgroundColor = '#000000';
+                }}
+              >
+                <Sparkles size={16} />
+                TikTok
               </a>
             </div>
           </div>
@@ -345,12 +366,12 @@ const AboutCompany: React.FC = () => {
       </section>
 
       {/* CTA Section */}
-      <section style={{ padding: '6rem 0', background: 'linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%)' }}>
+      <section style={{ padding: '6rem 0', background: '#fff' }}>
         <div className="container" style={{ textAlign: 'center', maxWidth: '800px' }}>
-          <h2 style={{ fontSize: '2.5rem', color: '#fff', marginBottom: '1.5rem' }}>
+          <h2 style={{ fontSize: '2.5rem', color: 'var(--color-primary-dark)', marginBottom: '1.5rem' }}>
             Ready to Start Your Fertility Journey?
           </h2>
-          <p style={{ fontSize: '1.15rem', color: 'rgba(255,255,255,0.9)', marginBottom: '2.5rem', lineHeight: '1.6' }}>
+          <p style={{ fontSize: '1.15rem', color: 'var(--color-text-muted)', marginBottom: '2.5rem', lineHeight: '1.6' }}>
             Book a personalized coaching session or explore our premium supplements designed to support your reproductive health.
           </p>
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -358,8 +379,8 @@ const AboutCompany: React.FC = () => {
               to="/shop?category=Coaching Services"
               className="btn"
               style={{
-                background: '#fff',
-                color: 'var(--color-primary-dark)',
+                background: 'var(--color-primary)',
+                color: '#fff',
                 padding: '0.75rem 2rem',
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -372,8 +393,8 @@ const AboutCompany: React.FC = () => {
               to="/shop"
               className="btn btn-glass"
               style={{
-                border: '2px solid #fff',
-                color: '#fff',
+                border: '2px solid var(--color-primary)',
+                color: 'var(--color-primary)',
                 padding: '0.75rem 2rem',
                 display: 'inline-flex',
                 alignItems: 'center',

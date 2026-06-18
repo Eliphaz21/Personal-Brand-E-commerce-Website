@@ -4,7 +4,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useCart } from '../hooks/useCart';
 import apiClient from '../services/apiClient';
 import type { Product } from '../types';
-import { Star, Search, SlidersHorizontal, ArrowUpDown, ShoppingCart, CheckCircle, HelpCircle } from 'lucide-react';
+import { Star, Search, SlidersHorizontal, ArrowUpDown, ShoppingCart, CheckCircle, HelpCircle, ChevronDown } from 'lucide-react';
 
 const normalizeSortParam = (value: string | null): string => {
   const legacyMap: Record<string, string> = {
@@ -29,7 +29,7 @@ export const ProductCatalog: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   const [search, setSearch] = useState(searchParams.get('search') || '');
   const [selectedCategory, setSelectedCategory] = useState(searchParams.get('category') || 'All');
   const [productType, setProductType] = useState(searchParams.get('productType') || 'all');
@@ -42,6 +42,7 @@ export const ProductCatalog: React.FC = () => {
   const [addingId, setAddingId] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<{ [key: string]: boolean }>({});
   const [showFiltersMobile, setShowFiltersMobile] = useState(false);
+  const [isCategoryExpanded, setIsCategoryExpanded] = useState(true);
 
   // Constants
   const defaultCategories = [
@@ -97,7 +98,7 @@ export const ProductCatalog: React.FC = () => {
     };
 
     fetchFilteredProducts();
-    
+
     // Sync React states back to URL search params
     const nextParams: any = {};
     if (search) nextParams.search = search;
@@ -108,7 +109,7 @@ export const ProductCatalog: React.FC = () => {
     if (inStock) nextParams.inStock = 'true';
     if (sort) nextParams.sort = sort;
     setSearchParams(nextParams);
-    
+
   }, [search, selectedCategory, productType, minPrice, maxPrice, inStock, sort]);
 
   const handleAddToCart = async (product: Product) => {
@@ -147,7 +148,7 @@ export const ProductCatalog: React.FC = () => {
   };
 
   return (
-    <div className="catalog-page container" style={{ padding: '3rem 2rem', minHeight: '100vh' }}>
+    <div className="catalog-page container" style={{ padding: '3rem 1rem 3rem 0', minHeight: '100vh' }}>
       {/* Page Header */}
       <div style={{ marginBottom: '3rem' }}>
         <h1 style={{ fontSize: '2.5rem', color: 'var(--color-primary-dark)', marginBottom: '0.5rem' }}>E-Commerce Catalog</h1>
@@ -159,7 +160,7 @@ export const ProductCatalog: React.FC = () => {
         {/* Search */}
         <div style={{ position: 'relative', flex: 1, minWidth: '260px' }}>
           <span style={searchIconStyle}><Search size={18} /></span>
-          <input 
+          <input
             type="text"
             placeholder="Search products or supplements..."
             value={search}
@@ -188,7 +189,7 @@ export const ProductCatalog: React.FC = () => {
           </div>
 
           {/* Toggle Filter Button on Mobile */}
-          <button 
+          <button
             className="btn btn-outline filter-toggle-btn"
             onClick={() => setShowFiltersMobile(!showFiltersMobile)}
             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
@@ -200,39 +201,60 @@ export const ProductCatalog: React.FC = () => {
 
       {/* Main Page Grid */}
       <div style={{ display: 'flex', gap: '2rem', marginTop: '2rem' }}>
-        
+
         {/* LEFT COLUMN: Sidebar Filters */}
         <aside className={`catalog-sidebar ${showFiltersMobile ? 'show' : ''}`} style={sidebarContainerStyle}>
           {/* Category Filter */}
           <div style={filterSectionStyle}>
-            <h4 style={filterTitleStyle}>Category</h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <button 
-                onClick={() => setSelectedCategory('All')}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                cursor: 'pointer',
+                marginBottom: '1rem'
+              }}
+              onClick={() => setIsCategoryExpanded(!isCategoryExpanded)}
+            >
+              <h4 style={{ ...filterTitleStyle, margin: 0 }}>Category</h4>
+              <ChevronDown
+                size={18}
+                color="var(--color-primary-dark)"
                 style={{
-                  ...categoryFilterLinkStyle,
-                  fontWeight: selectedCategory === 'All' ? 'bold' : 'normal',
-                  color: selectedCategory === 'All' ? 'var(--color-primary)' : 'var(--color-text-main)',
-                  backgroundColor: selectedCategory === 'All' ? 'var(--color-primary-light)' : 'transparent'
+                  transition: 'transform 0.3s ease',
+                  transform: isCategoryExpanded ? 'rotate(0deg)' : 'rotate(-90deg)'
                 }}
-              >
-                All Products
-              </button>
-              {categories.map((cat) => (
+              />
+            </div>
+            {isCategoryExpanded && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
+                  onClick={() => setSelectedCategory('All')}
                   style={{
                     ...categoryFilterLinkStyle,
-                    fontWeight: selectedCategory === cat ? 'bold' : 'normal',
-                    color: selectedCategory === cat ? 'var(--color-primary)' : 'var(--color-text-main)',
-                    backgroundColor: selectedCategory === cat ? 'var(--color-primary-light)' : 'transparent'
+                    fontWeight: selectedCategory === 'All' ? 'bold' : 'normal',
+                    color: selectedCategory === 'All' ? 'var(--color-primary)' : 'var(--color-text-main)',
+                    backgroundColor: selectedCategory === 'All' ? 'var(--color-primary-light)' : 'transparent'
                   }}
                 >
-                  {cat}
+                  View All Products
                 </button>
-              ))}
-            </div>
+                {categories.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setSelectedCategory(cat)}
+                    style={{
+                      ...categoryFilterLinkStyle,
+                      fontWeight: selectedCategory === cat ? 'bold' : 'normal',
+                      color: selectedCategory === cat ? 'var(--color-primary)' : 'var(--color-text-main)',
+                      backgroundColor: selectedCategory === cat ? 'var(--color-primary-light)' : 'transparent'
+                    }}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Product Type Filter */}
@@ -292,7 +314,7 @@ export const ProductCatalog: React.FC = () => {
           </div>
 
           {/* Clear Filters Button */}
-          <button 
+          <button
             onClick={handleClearFilters}
             className="btn btn-outline"
             style={{ width: '100%', padding: '0.625rem', fontSize: '0.85rem' }}
@@ -314,7 +336,7 @@ export const ProductCatalog: React.FC = () => {
               <p style={{ color: 'var(--color-text-muted)', marginTop: '0.5rem' }}>
                 We couldn't find matches matching those filter constraints. Try expanding your parameters.
               </p>
-              <button 
+              <button
                 onClick={handleClearFilters}
                 className="btn btn-primary"
                 style={{ marginTop: '1.5rem' }}
@@ -327,16 +349,16 @@ export const ProductCatalog: React.FC = () => {
               <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: '1.5rem' }}>
                 Showing {products.length} products & services
               </p>
-              
+
               <div className="grid-3">
                 {products.map((product) => {
                   const hasDiscount = product.compareAtPrice > product.price;
                   const isOutOfStock = product.stock === 0;
-                  
+
                   return (
-                    <div 
-                      key={product._id} 
-                      className="product-card glass-panel" 
+                    <div
+                      key={product._id}
+                      className="product-card glass-panel"
                       style={productCardStyle}
                     >
                       {/* Badge */}
@@ -348,13 +370,13 @@ export const ProductCatalog: React.FC = () => {
                       )}
 
                       {/* Image */}
-                      <Link 
+                      <Link
                         to={`/product/${product.slug}`}
                         style={{ display: 'block', height: '220px', borderRadius: '12px', overflow: 'hidden', marginBottom: '1rem' }}
                       >
-                        <img 
-                          src={product.images[0]?.url || 'https://via.placeholder.com/300'} 
-                          alt={product.title} 
+                        <img
+                          src={product.images[0]?.url || 'https://via.placeholder.com/300'}
+                          alt={product.title}
                           style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.4s ease' }}
                           className="product-img"
                         />
@@ -365,7 +387,7 @@ export const ProductCatalog: React.FC = () => {
                         <span style={{ fontSize: '0.7rem', color: 'var(--color-secondary)', fontWeight: 600, textTransform: 'uppercase', marginBottom: '0.25rem' }}>
                           {product.category}
                         </span>
-                        
+
                         <Link to={`/product/${product.slug}`} style={{ textDecoration: 'none' }}>
                           <h3 style={{ fontSize: '1.05rem', color: 'var(--color-primary-dark)', marginBottom: '0.5rem', height: '2.4em', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>
                             {product.title}
@@ -392,7 +414,7 @@ export const ProductCatalog: React.FC = () => {
                             )}
                           </div>
 
-                          <button 
+                          <button
                             onClick={() => handleAddToCart(product)}
                             disabled={addingId === product._id || (isOutOfStock && product.productType !== 'affiliate')}
                             style={{
