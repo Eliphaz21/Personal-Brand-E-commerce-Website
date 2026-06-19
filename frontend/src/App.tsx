@@ -11,6 +11,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import VerifyOTP from './pages/VerifyOTP';
+import ForgotPassword from './pages/ForgotPassword';
 import ProductCatalog from './pages/ProductCatalog';
 import ProductDetails from './pages/ProductDetails';
 import Cart from './pages/Cart';
@@ -45,6 +46,7 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/verify-otp" element={<VerifyOTP />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/about" element={<AboutCompany />} />
               <Route path="/portfolio" element={<Portfolio />} />
 
