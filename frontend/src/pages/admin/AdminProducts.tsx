@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import apiClient from '../../services/apiClient';
 import type { Product } from '../../types';
-import { 
-  Plus, 
-  Search, 
-  Edit, 
-  Trash2, 
-  Loader, 
-  X, 
-  Upload, 
+import {
+  Plus,
+  Search,
+  Edit,
+  Trash2,
+  Loader,
+  X,
+  Upload,
   AlertCircle,
   CheckCircle,
   ChevronLeft,
@@ -359,8 +359,8 @@ export const AdminProducts: React.FC = () => {
     } catch (err: any) {
       console.error('Error saving product:', err);
       setModalError(
-        err.response?.data?.message || 
-        err.response?.data?.error || 
+        err.response?.data?.message ||
+        err.response?.data?.error ||
         'Failed to save product details. Please check form constraints.'
       );
     } finally {
@@ -384,7 +384,7 @@ export const AdminProducts: React.FC = () => {
 
   return (
     <div className="admin-products" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-      
+
       {/* Header and Add Button */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
@@ -396,8 +396,8 @@ export const AdminProducts: React.FC = () => {
           </p>
         </div>
 
-        <button 
-          onClick={openAddModal} 
+        <button
+          onClick={openAddModal}
           className="btn btn-primary"
           style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 1.5rem', borderRadius: '999px', fontSize: '0.9rem', fontWeight: 600 }}
         >
@@ -500,8 +500,8 @@ export const AdminProducts: React.FC = () => {
           </div>
 
           {(search || categoryFilter) && (
-            <button 
-              onClick={handleResetFilters} 
+            <button
+              onClick={handleResetFilters}
               style={{
                 background: 'none',
                 border: 'none',
@@ -550,16 +550,16 @@ export const AdminProducts: React.FC = () => {
               </thead>
               <tbody>
                 {products.map((prod) => (
-                  <tr 
-                    key={prod._id} 
+                  <tr
+                    key={prod._id}
                     style={{ borderBottom: '1px solid var(--color-border)', backgroundColor: 'transparent', transition: 'background-color 0.2s' }}
                     onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.4)'}
                     onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                   >
                     <td style={{ padding: '1rem 1.5rem' }}>
-                      <img 
-                        src={prod.images?.[0]?.url || 'https://via.placeholder.com/60?text=No+Image'} 
-                        alt={prod.title} 
+                      <img
+                        src={prod.images?.[0]?.url || 'https://via.placeholder.com/60?text=No+Image'}
+                        alt={prod.title}
                         style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '8px', border: '1px solid var(--color-border)' }}
                       />
                     </td>
@@ -602,8 +602,8 @@ export const AdminProducts: React.FC = () => {
                     </td>
                     <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>
                       <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                        <button 
-                          onClick={() => openEditModal(prod)} 
+                        <button
+                          onClick={() => openEditModal(prod)}
                           style={{
                             border: 'none',
                             background: 'none',
@@ -616,8 +616,8 @@ export const AdminProducts: React.FC = () => {
                         >
                           <Edit size={16} />
                         </button>
-                        <button 
-                          onClick={() => handleDeleteProduct(prod._id)} 
+                        <button
+                          onClick={() => handleDeleteProduct(prod._id)}
                           style={{
                             border: 'none',
                             background: 'none',
@@ -652,16 +652,16 @@ export const AdminProducts: React.FC = () => {
           }}>
             <span>Showing {products.length} of {totalCount} items</span>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <button 
-                onClick={() => setPage(prev => Math.max(prev - 1, 1))} 
+              <button
+                onClick={() => setPage(prev => Math.max(prev - 1, 1))}
                 disabled={page === 1}
                 className="btn btn-outline"
                 style={{ padding: '0.4rem 0.8rem', display: 'flex', alignItems: 'center' }}
               >
                 <ChevronLeft size={16} /> Prev
               </button>
-              <button 
-                onClick={() => setPage(prev => Math.min(prev + 1, totalPages))} 
+              <button
+                onClick={() => setPage(prev => Math.min(prev + 1, totalPages))}
                 disabled={page === totalPages}
                 className="btn btn-outline"
                 style={{ padding: '0.4rem 0.8rem', display: 'flex', alignItems: 'center' }}
@@ -713,8 +713,8 @@ export const AdminProducts: React.FC = () => {
               <h2 style={{ fontSize: '1.35rem', fontWeight: 700, color: 'var(--color-primary-dark)', margin: 0 }}>
                 {editingProduct ? 'Edit Product Details' : 'Create New Product'}
               </h2>
-              <button 
-                onClick={() => setIsModalOpen(false)} 
+              <button
+                onClick={() => setIsModalOpen(false)}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)' }}
               >
                 <X size={20} />
@@ -724,7 +724,7 @@ export const AdminProducts: React.FC = () => {
             {/* Modal Form Content */}
             <form onSubmit={handleModalSubmit} style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
               <div style={{ padding: '2rem', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1.25rem', maxHeight: '60vh' }}>
-                
+
                 {modalError && (
                   <div style={{
                     padding: '0.75rem 1rem',
@@ -756,7 +756,7 @@ export const AdminProducts: React.FC = () => {
                       placeholder="e.g. PCOS Support Plus"
                     />
                   </div>
-                  
+
                   <div className="form-group" style={{ margin: 0 }}>
                     <label className="form-label">SKU / Code</label>
                     <input
@@ -861,7 +861,7 @@ export const AdminProducts: React.FC = () => {
                       className="form-input"
                     />
                   </div>
-                  
+
                   <div className="form-group" style={{ margin: 0 }}>
                     <label className="form-label">Compare-at ($)</label>
                     <input
@@ -927,7 +927,7 @@ export const AdminProducts: React.FC = () => {
                     />
                     Featured Product
                   </label>
-                  
+
                   <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600, fontSize: '0.9rem', cursor: 'pointer' }}>
                     <input
                       type="checkbox"
@@ -958,8 +958,8 @@ export const AdminProducts: React.FC = () => {
                       backgroundColor: 'rgba(0,0,0,0.01)',
                       transition: 'border-color 0.2s'
                     }}
-                    onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--color-primary)'}
-                    onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--color-border)'}>
+                      onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--color-primary)'}
+                      onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--color-border)'}>
                       <input
                         type="file"
                         multiple
@@ -1110,8 +1110,8 @@ export const AdminProducts: React.FC = () => {
                         {existingImages.map((img) => {
                           const isMarked = imagesToDelete.includes(img.publicId);
                           return (
-                            <div 
-                              key={img.publicId} 
+                            <div
+                              key={img.publicId}
                               onClick={() => toggleImageDelete(img.publicId)}
                               style={{
                                 width: '64px',
@@ -1198,6 +1198,74 @@ export const AdminProducts: React.FC = () => {
         </div>
       )}
 
+      {/* Mobile Responsive Styles */}
+      <style>{`
+        @media (max-width: 768px) {
+          .products-header {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 1rem !important;
+          }
+          
+          .search-bar {
+            width: 100% !important;
+          }
+          
+          .add-product-button {
+            width: 100% !important;
+            justify-content: center !important;
+          }
+          
+          .products-table {
+            font-size: 0.85rem !important;
+          }
+          
+          .products-table th,
+          .products-table td {
+            padding: 0.75rem 0.5rem !important;
+          }
+          
+          .product-form {
+            padding: 1.5rem !important;
+          }
+          
+          .form-grid {
+            grid-template-columns: 1fr !important;
+            gap: 1rem !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .products-table-container {
+            overflow-x: auto !important;
+          }
+          
+          .products-table {
+            min-width: 600px !important;
+          }
+          
+          .action-buttons {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+          }
+          
+          .action-button {
+            width: 100% !important;
+            justify-content: center !important;
+          }
+          
+          .modal-content {
+            width: 95% !important;
+            max-height: 90vh !important;
+            margin: 5vh auto !important;
+          }
+          
+          .image-upload-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 0.5rem !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };

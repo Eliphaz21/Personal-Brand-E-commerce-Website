@@ -136,7 +136,7 @@ export const Home: React.FC = () => {
             <div className="hero-3d-card" style={hero3DCardStyle}>
               {/* Glass reflection shine */}
               <div className="shine-line" style={shineLineStyle} />
-              
+
               <div style={{ position: 'relative', zIndex: 2 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                   <Heart size={32} color="var(--color-secondary)" fill="var(--color-secondary)" />
@@ -178,9 +178,9 @@ export const Home: React.FC = () => {
               position: 'relative',
               backgroundColor: 'var(--color-primary-light)'
             }}>
-              <img 
-                src="https://p16-common-sign.tiktokcdn.com/tos-maliva-avt-0068/f4e9cd42f22ac626004332a37464cd61~tplv-tiktokx-cropcenter:1080:1080.jpeg?dr=14579&refresh_token=f9732c81&x-expires=1781877600&x-signature=xJaVAb3gcwuah5wMcK7vRZ%2F9%2BO4%3D&t=4d5b0474&ps=13740610&shp=a5d48078&shcp=81f88b70&idc=my" 
-                alt="Kidist - Fertility Coach" 
+              <img
+                src="https://p16-common-sign.tiktokcdn.com/tos-maliva-avt-0068/f4e9cd42f22ac626004332a37464cd61~tplv-tiktokx-cropcenter:1080:1080.jpeg?dr=14579&refresh_token=f9732c81&x-expires=1781877600&x-signature=xJaVAb3gcwuah5wMcK7vRZ%2F9%2BO4%3D&t=4d5b0474&ps=13740610&shp=a5d48078&shcp=81f88b70&idc=my"
+                alt="Kidist - Fertility Coach"
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
               <div className="glass-panel" style={{
@@ -243,8 +243,8 @@ export const Home: React.FC = () => {
 
           <div className="grid-4">
             {categories.map((cat, i) => (
-              <Link 
-                key={i} 
+              <Link
+                key={i}
                 to={`/shop?category=${encodeURIComponent(cat.name)}`}
                 className="category-card"
                 style={{
@@ -296,9 +296,9 @@ export const Home: React.FC = () => {
           ) : (
             <div className="grid-4">
               {products.map((product) => (
-                <div 
-                  key={product._id} 
-                  className="product-card-3d glass-panel" 
+                <div
+                  key={product._id}
+                  className="product-card-3d glass-panel"
                   style={productCard3DStyle}
                 >
                   {/* Badge */}
@@ -308,9 +308,9 @@ export const Home: React.FC = () => {
 
                   {/* Product Image */}
                   <Link to={`/product/${product.slug}`} style={{ display: 'block', height: '220px', overflow: 'hidden', borderRadius: '12px', marginBottom: '1.25rem' }}>
-                    <img 
-                      src={product.images[0]?.url || 'https://via.placeholder.com/300'} 
-                      alt={product.title} 
+                    <img
+                      src={product.images[0]?.url || 'https://via.placeholder.com/300'}
+                      alt={product.title}
                       style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }}
                       className="product-img"
                     />
@@ -493,6 +493,44 @@ export const Home: React.FC = () => {
         @keyframes shine {
           0% { left: -100%; }
           100% { left: 200%; }
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+          .home-page section {
+            padding: 3rem 0 !important;
+          }
+          
+          .hero-3d-card {
+            transform: none !important;
+            margin-top: 2rem;
+          }
+          
+          .bg-float {
+            display: none !important;
+          }
+          
+          .hero-3d-card:hover {
+            transform: none !important;
+          }
+          
+          .category-card:hover {
+            transform: none !important;
+          }
+          
+          .product-card-3d:hover {
+            transform: none !important;
+          }
+        }
+        
+        @media (max-width: 480px) {
+          .home-page section {
+            padding: 2rem 0 !important;
+          }
+          
+          .hero-3d-card {
+            padding: 1.5rem !important;
+          }
         }
       `}</style>
     </div>

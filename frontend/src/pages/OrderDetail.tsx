@@ -7,18 +7,18 @@ import {
 } from 'lucide-react';
 
 const ORDER_STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
-  pending:    { label: 'Pending',     color: 'hsl(40,70%,45%)',   icon: <Clock size={14} /> },
-  processing: { label: 'Processing',  color: 'hsl(210,80%,50%)',  icon: <Loader size={14} /> },
-  shipped:    { label: 'Shipped',     color: 'hsl(200,70%,40%)',  icon: <Truck size={14} /> },
-  delivered:  { label: 'Delivered',   color: 'hsl(140,40%,40%)',  icon: <CheckCircle size={14} /> },
-  cancelled:  { label: 'Cancelled',   color: 'hsl(0,60%,50%)',    icon: <XCircle size={14} /> },
+  pending: { label: 'Pending', color: 'hsl(40,70%,45%)', icon: <Clock size={14} /> },
+  processing: { label: 'Processing', color: 'hsl(210,80%,50%)', icon: <Loader size={14} /> },
+  shipped: { label: 'Shipped', color: 'hsl(200,70%,40%)', icon: <Truck size={14} /> },
+  delivered: { label: 'Delivered', color: 'hsl(140,40%,40%)', icon: <CheckCircle size={14} /> },
+  cancelled: { label: 'Cancelled', color: 'hsl(0,60%,50%)', icon: <XCircle size={14} /> },
 };
 
 const PAYMENT_STATUS_CONFIG: Record<string, { label: string; color: string }> = {
-  pending:  { label: 'Payment Pending', color: 'hsl(40,70%,45%)' },
-  paid:     { label: 'Paid',            color: 'hsl(140,40%,40%)' },
-  failed:   { label: 'Payment Failed',  color: 'hsl(0,60%,50%)' },
-  refunded: { label: 'Refunded',        color: 'hsl(210,80%,50%)' },
+  pending: { label: 'Payment Pending', color: 'hsl(40,70%,45%)' },
+  paid: { label: 'Paid', color: 'hsl(140,40%,40%)' },
+  failed: { label: 'Payment Failed', color: 'hsl(0,60%,50%)' },
+  refunded: { label: 'Refunded', color: 'hsl(210,80%,50%)' },
 };
 
 export const OrderDetail: React.FC = () => {
@@ -197,6 +197,76 @@ export const OrderDetail: React.FC = () => {
       <style>{`
         @media (max-width: 900px) {
           .order-detail-grid { grid-template-columns: 1fr !important; }
+        }
+
+        /* Enhanced Mobile Responsiveness */
+        @media (max-width: 768px) {
+          .order-detail-container {
+            padding: 1rem 0.5rem 3rem 0 !important;
+          }
+          
+          .card {
+            padding: 1.25rem !important;
+          }
+          
+          .order-item {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 0.75rem !important;
+          }
+          
+          .order-item-image {
+            width: 80px !important;
+            height: 80px !important;
+          }
+          
+          .section-title {
+            font-size: 1rem !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .order-detail-container {
+            padding: 1rem 0 3rem 0 !important;
+          }
+          
+          .card {
+            padding: 1rem !important;
+            border-radius: 12px !important;
+          }
+          
+          .order-header {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 0.5rem !important;
+          }
+          
+          .order-id {
+            font-size: 0.85rem !important;
+          }
+          
+          .status-badge {
+            font-size: 0.75rem !important;
+            padding: 0.25rem 0.5rem !important;
+          }
+          
+          .order-item {
+            padding: 0.75rem !important;
+          }
+          
+          .order-item-image {
+            width: 60px !important;
+            height: 60px !important;
+          }
+          
+          .summary-row {
+            font-size: 0.85rem !important;
+          }
+          
+          .back-button {
+            width: 100% !important;
+            justify-content: center !important;
+          }
         }
       `}</style>
     </div>

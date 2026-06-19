@@ -1001,6 +1001,76 @@ export const AdminUsers: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Mobile Responsive Styles */}
+      <style>{`
+        @media (max-width: 768px) {
+          .users-header {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 1rem !important;
+          }
+          
+          .search-bar {
+            width: 100% !important;
+          }
+          
+          .users-table {
+            font-size: 0.85rem !important;
+          }
+          
+          .users-table th,
+          .users-table td {
+            padding: 0.75rem 0.5rem !important;
+          }
+          
+          .user-details {
+            padding: 1.5rem !important;
+          }
+          
+          .user-info-grid {
+            grid-template-columns: 1fr !important;
+            gap: 1rem !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .users-table-container {
+            overflow-x: auto !important;
+          }
+          
+          .users-table {
+            min-width: 600px !important;
+          }
+          
+          .role-badge {
+            font-size: 0.75rem !important;
+            padding: 0.25rem 0.5rem !important;
+          }
+          
+          .action-buttons {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+          }
+          
+          .action-button {
+            width: 100% !important;
+            justify-content: center !important;
+          }
+          
+          .modal-content {
+            width: 95% !important;
+            max-height: 90vh !important;
+            margin: 5vh auto !important;
+          }
+          
+          .detail-row {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 0.25rem !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };

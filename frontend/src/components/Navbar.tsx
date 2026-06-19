@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useCart } from '../hooks/useCart';
-import { User, Package, Shield } from 'lucide-react';
+import { User, Package, Shield, Menu, X } from 'lucide-react';
 
 const AMAZON_ORANGE = '#FF9900';
 
@@ -49,9 +49,14 @@ const AmazonCartIcon: React.FC<{ count: number }> = ({ count }) => (
 export const Navbar: React.FC = () => {
   const { user, isAuthenticated } = useAuth();
   const { totalItemsCount } = useCart();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
     `nav-link${isActive ? ' active' : ''}`;
+
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
 
   return (
     <header style={{
@@ -82,13 +87,33 @@ export const Navbar: React.FC = () => {
             </Link>
           </div>
 
+          {/* Desktop Navigation */}
           <nav className="navbar-links" style={{ display: 'flex', gap: '1.25rem', alignItems: 'center', justifyContent: 'center', flex: 1 }} aria-label="Primary navigation">
             <NavLink to="/" end className={navLinkClass} style={navLinkStyle}>Home</NavLink>
             <NavLink to="/shop" className={navLinkClass} style={navLinkStyle}>Shop</NavLink>
             <NavLink to="/about" className={navLinkClass} style={navLinkStyle}>About</NavLink>
           </nav>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', justifyContent: 'flex-end' }}>
+          {/* Mobile Menu Button */}
+          <button
+            className="mobile-menu-btn"
+            onClick={toggleMobileMenu}
+            style={{
+              display: 'none',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '0.5rem',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            aria-label="Toggle mobile menu"
+          >
+            {mobileMenuOpen ? <X size={24} color="#3D2B1F" /> : <Menu size={24} color="#3D2B1F" />}
+          </button>
+
+          {/* Desktop Right Side */}
+          <div className="navbar-right" style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', justifyContent: 'flex-end' }}>
             {isAuthenticated ? (
               <>
                 {user?.role === 'admin' && (
@@ -153,9 +178,128 @@ export const Navbar: React.FC = () => {
         </div>
       </div>
 
+      {/* Mobile Menu */}
+      <div className={`mobile-menu ${mobileMenuOpen ? 'open' : ''}`} style={{
+        display: 'none',
+        position: 'fixed',
+        top: '70px',
+        left: 0,
+        right: 0,
+        background: '#ffffff',
+        boxShadow: '0 8px 24px rgba(0,0,0,0.15)',
+        zIndex: 999,
+        padding: '1rem 0',
+        borderBottom: '1px solid rgba(61,43,31,0.1)'
+      }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', padding: '0 1.5rem' }}>
+          <NavLink
+            to="/"
+            end
+            className={navLinkClass}
+            style={{ ...navLinkStyle, padding: '1rem 0', borderBottom: '1px solid rgba(61,43,31,0.08)' }}
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Home
+          </NavLink>
+          <NavLink
+            to="/shop"
+            className={navLinkClass}
+            style={{ ...navLinkStyle, padding: '1rem 0', borderBottom: '1px solid rgba(61,43,31,0.08)' }}
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Shop
+          </NavLink>
+          <NavLink
+            to="/about"
+            className={navLinkClass}
+            style={{ ...navLinkStyle, padding: '1rem 0', borderBottom: '1px solid rgba(61,43,31,0.08)' }}
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            About
+          </NavLink>
+
+          {isAuthenticated && (
+            <>
+              <div style={{ padding: '1rem 0', borderBottom: '1px solid rgba(61,43,31,0.08)' }}>
+                <Link
+                  to="/cart"
+                  style={{ ...navLinkStyle, padding: '0.5rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <AmazonCartIcon count={totalItemsCount} />
+                  Cart ({totalItemsCount})
+                </Link>
+              </div>
+              <div style={{ padding: '1rem 0', borderBottom: '1px solid rgba(61,43,31,0.08)' }}>
+                <Link
+                  to="/orders"
+                  style={{ ...navLinkStyle, padding: '0.5rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Package size={20} strokeWidth={2} color="#3D2B1F" />
+                  Orders
+                </Link>
+              </div>
+              <div style={{ padding: '1rem 0', borderBottom: '1px solid rgba(61,43,31,0.08)' }}>
+                <Link
+                  to="/profile"
+                  style={{ ...navLinkStyle, padding: '0.5rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <User size={20} strokeWidth={2} color="#3D2B1F" />
+                  Account
+                </Link>
+              </div>
+              {user?.role === 'admin' && (
+                <div style={{ padding: '1rem 0', borderBottom: '1px solid rgba(61,43,31,0.08)' }}>
+                  <Link
+                    to="/admin"
+                    style={{ ...navLinkStyle, padding: '0.5rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#3D2B1F' }}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <Shield size={20} strokeWidth={2} color="#3D2B1F" />
+                    Admin Panel
+                  </Link>
+                </div>
+              )}
+            </>
+          )}
+
+          {!isAuthenticated && (
+            <div style={{ display: 'flex', gap: '0.5rem', padding: '1rem 0' }}>
+              <Link
+                to="/login"
+                className="btn"
+                style={{ padding: '0.5rem 1rem', background: 'transparent', color: '#3D2B1F', border: '1px solid rgba(61,43,31,0.15)', borderRadius: 10, fontWeight: 700, textDecoration: 'none', flex: 1, textAlign: 'center' }}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Login
+              </Link>
+              <Link
+                to="/register"
+                className="btn"
+                style={{ padding: '0.5rem 1rem', background: '#3D2B1F', color: '#FFE4C4', borderRadius: 10, fontWeight: 700, textDecoration: 'none', flex: 1, textAlign: 'center' }}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Register
+              </Link>
+            </div>
+          )}
+        </div>
+      </div>
+
       <style>{`
         @media (max-width: 900px) {
           .navbar-links { display: none !important; }
+          .navbar-right { display: none !important; }
+          .mobile-menu-btn { display: flex !important; }
+          .mobile-menu { display: block !important; }
+          .mobile-menu.open {
+            display: block !important;
+          }
+          .mobile-menu:not(.open) {
+            display: none !important;
+          }
         }
       `}</style>
     </header>

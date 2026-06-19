@@ -21,7 +21,7 @@ const ForgotPassword: React.FC = () => {
   // Password strength validation
   const validatePassword = (password: string): { isValid: boolean; errors: string[] } => {
     const errors: string[] = [];
-    
+
     if (password.length < 8) {
       errors.push('Password must be at least 8 characters');
     }
@@ -34,7 +34,7 @@ const ForgotPassword: React.FC = () => {
     if (!/[0-9]/.test(password)) {
       errors.push('Password must contain at least one number');
     }
-    
+
     return {
       isValid: errors.length === 0,
       errors
@@ -50,7 +50,7 @@ const ForgotPassword: React.FC = () => {
 
     try {
       const response = await apiClient.post('/auth/forgot-password', { email });
-      
+
       if (response.data.success) {
         setSuccess(response.data.message);
         setStep('otp');
@@ -58,8 +58,8 @@ const ForgotPassword: React.FC = () => {
       }
     } catch (err: any) {
       setError(
-        err.response?.data?.message || 
-        err.response?.data?.error || 
+        err.response?.data?.message ||
+        err.response?.data?.error ||
         'Failed to send reset code. Please try again.'
       );
     } finally {
@@ -86,7 +86,7 @@ const ForgotPassword: React.FC = () => {
       setStep('new-password');
     } catch (err: any) {
       setError(
-        err.response?.data?.message || 
+        err.response?.data?.message ||
         'Invalid verification code. Please try again.'
       );
     } finally {
@@ -129,8 +129,8 @@ const ForgotPassword: React.FC = () => {
       }
     } catch (err: any) {
       setError(
-        err.response?.data?.message || 
-        err.response?.data?.error || 
+        err.response?.data?.message ||
+        err.response?.data?.error ||
         'Failed to reset password. Please try again.'
       );
     } finally {
@@ -141,13 +141,13 @@ const ForgotPassword: React.FC = () => {
   // Resend OTP
   const handleResendOTP = async () => {
     if (countdown > 0) return;
-    
+
     setResendLoading(true);
     setError('');
 
     try {
       const response = await apiClient.post('/auth/forgot-password', { email });
-      
+
       if (response.data.success) {
         setSuccess('A new code has been sent to your email');
         setOtp('');
@@ -155,7 +155,7 @@ const ForgotPassword: React.FC = () => {
       }
     } catch (err: any) {
       setError(
-        err.response?.data?.message || 
+        err.response?.data?.message ||
         'Failed to resend code. Please try again.'
       );
     } finally {
@@ -187,11 +187,11 @@ const ForgotPassword: React.FC = () => {
       <div className="glass-panel animate-fade-in-up" style={cardStyle}>
         {/* Back Button */}
         {step !== 'success' && (
-          <Link 
-            to="/login" 
-            style={{ 
-              display: 'inline-flex', 
-              alignItems: 'center', 
+          <Link
+            to="/login"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
               gap: '0.5rem',
               color: 'var(--color-text-muted)',
               fontSize: '0.85rem',
@@ -277,10 +277,10 @@ const ForgotPassword: React.FC = () => {
               </div>
             </div>
 
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={loading}
-              className="btn btn-primary" 
+              className="btn btn-primary"
               style={{ width: '100%', padding: '0.875rem', display: 'flex', justifyContent: 'center', gap: '0.5rem' }}
             >
               {loading ? (
@@ -310,7 +310,7 @@ const ForgotPassword: React.FC = () => {
                 value={otp}
                 onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
                 className="form-input"
-                style={{ 
+                style={{
                   fontSize: '1.5rem',
                   letterSpacing: '0.5rem',
                   textAlign: 'center',
@@ -323,10 +323,10 @@ const ForgotPassword: React.FC = () => {
               </p>
             </div>
 
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={loading}
-              className="btn btn-primary" 
+              className="btn btn-primary"
               style={{ width: '100%', padding: '0.875rem', display: 'flex', justifyContent: 'center', gap: '0.5rem' }}
             >
               {loading ? (
@@ -422,10 +422,10 @@ const ForgotPassword: React.FC = () => {
               )}
             </div>
 
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={loading}
-              className="btn btn-primary" 
+              className="btn btn-primary"
               style={{ width: '100%', padding: '0.875rem', display: 'flex', justifyContent: 'center', gap: '0.5rem' }}
             >
               {loading ? (
@@ -447,11 +447,11 @@ const ForgotPassword: React.FC = () => {
             <button
               onClick={goToLogin}
               className="btn btn-primary"
-              style={{ 
-                width: '100%', 
-                padding: '0.875rem', 
-                display: 'flex', 
-                justifyContent: 'center', 
+              style={{
+                width: '100%',
+                padding: '0.875rem',
+                display: 'flex',
+                justifyContent: 'center',
                 gap: '0.5rem',
                 marginTop: '1.5rem'
               }}
@@ -485,6 +485,43 @@ const ForgotPassword: React.FC = () => {
         }
         @keyframes rotate {
           100% { transform: rotate(360deg); }
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+          .forgot-password-container {
+            padding: 1rem 0.5rem !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .forgot-password-container {
+            padding: 1rem 0 !important;
+            min-height: calc(100vh - 60px) !important;
+          }
+          
+          .glass-panel {
+            padding: 2rem 1.5rem !important;
+            border-radius: 16px !important;
+          }
+          
+          h1 {
+            font-size: 1.5rem !important;
+          }
+          
+          .form-input {
+            padding: 0.75rem 1rem !important;
+            font-size: 0.9rem !important;
+          }
+          
+          .btn {
+            padding: 0.75rem 1rem !important;
+            font-size: 0.9rem !important;
+          }
+          
+          #otp {
+            font-size: 1.25rem !important;
+          }
         }
       `}</style>
     </div>

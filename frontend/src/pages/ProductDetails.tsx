@@ -90,7 +90,7 @@ export const ProductDetails: React.FC = () => {
 
   const handleAddToCart = async () => {
     if (!product) return;
-    
+
     if (product.productType === 'affiliate' && product.affiliateUrl) {
       window.open(product.affiliateUrl, '_blank');
       return;
@@ -135,14 +135,14 @@ export const ProductDetails: React.FC = () => {
       setReviewSuccess('Review submitted successfully! Thank you for your feedback.');
       setNewComment('');
       setNewRating(5);
-      
+
       // Refresh reviews
       fetchReviews(product._id);
     } catch (err: any) {
       console.error('Review submit error:', err);
       setReviewError(
-        err.response?.data?.message || 
-        err.response?.data?.error || 
+        err.response?.data?.message ||
+        err.response?.data?.error ||
         'Failed to submit review. You must have purchased this item to review it.'
       );
     } finally {
@@ -173,13 +173,13 @@ export const ProductDetails: React.FC = () => {
 
   const isOutOfStock = product.stock === 0;
   const isLowStock = product.stock > 0 && product.stock <= (product.lowStockThreshold || 10);
-  const discountPercent = product.compareAtPrice > product.price 
-    ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100) 
+  const discountPercent = product.compareAtPrice > product.price
+    ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)
     : 0;
 
   return (
     <div className="product-details-page container" style={{ padding: '3rem 2rem' }}>
-      
+
       {/* Back button */}
       <Link to="/shop" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-muted)', marginBottom: '2rem', fontWeight: 500 }}>
         <ArrowLeft size={16} /> Back to shop
@@ -187,7 +187,7 @@ export const ProductDetails: React.FC = () => {
 
       {/* Main product card layout */}
       <div className="grid-2" style={{ gap: '3rem', marginBottom: '5rem' }}>
-        
+
         {/* Left Side: Images */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {/* Large display */}
@@ -199,9 +199,9 @@ export const ProductDetails: React.FC = () => {
             background: 'var(--color-glass)',
             position: 'relative'
           }}>
-            <img 
-              src={product.images[selectedImage]?.url || 'https://via.placeholder.com/600'} 
-              alt={product.title} 
+            <img
+              src={product.images[selectedImage]?.url || 'https://via.placeholder.com/600'}
+              alt={product.title}
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
             {discountPercent > 0 && (
@@ -210,7 +210,7 @@ export const ProductDetails: React.FC = () => {
               </span>
             )}
           </div>
-          
+
           {/* Thumbnails */}
           {product.images.length > 1 && (
             <div style={{ display: 'flex', gap: '0.75rem' }}>
@@ -248,11 +248,11 @@ export const ProductDetails: React.FC = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
             <div style={{ display: 'flex' }}>
               {[...Array(5)].map((_, i) => (
-                <Star 
-                  key={i} 
-                  size={18} 
-                  color={i < Math.floor(product.rating) ? '#ffd700' : 'var(--color-border)'} 
-                  fill={i < Math.floor(product.rating) ? '#ffd700' : 'none'} 
+                <Star
+                  key={i}
+                  size={18}
+                  color={i < Math.floor(product.rating) ? '#ffd700' : 'var(--color-border)'}
+                  fill={i < Math.floor(product.rating) ? '#ffd700' : 'none'}
                 />
               ))}
             </div>
@@ -311,7 +311,7 @@ export const ProductDetails: React.FC = () => {
                   padding: '0.25rem 0.5rem',
                   backgroundColor: '#fff'
                 }}>
-                  <button 
+                  <button
                     onClick={() => handleQuantityChange('dec')}
                     disabled={quantity <= 1}
                     style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', display: 'flex', color: quantity <= 1 ? 'var(--color-border)' : 'var(--color-primary-dark)' }}
@@ -319,7 +319,7 @@ export const ProductDetails: React.FC = () => {
                     <Minus size={16} />
                   </button>
                   <span style={{ width: '40px', textAlign: 'center', fontWeight: 'bold', fontSize: '1.1rem' }}>{quantity}</span>
-                  <button 
+                  <button
                     onClick={() => handleQuantityChange('inc')}
                     disabled={quantity >= product.stock}
                     style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', display: 'flex', color: quantity >= product.stock ? 'var(--color-border)' : 'var(--color-primary-dark)' }}
@@ -330,7 +330,7 @@ export const ProductDetails: React.FC = () => {
               )}
 
               {/* Purchase CTA */}
-              <button 
+              <button
                 onClick={handleAddToCart}
                 disabled={adding || isOutOfStock}
                 className="btn btn-primary"
@@ -389,7 +389,7 @@ export const ProductDetails: React.FC = () => {
         {activeTab === 'desc' && (
           <p style={{ whiteSpace: 'pre-line' }}>{product.description}</p>
         )}
-        
+
         {activeTab === 'specs' && (
           <div style={{ maxWidth: '600px' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -463,7 +463,7 @@ export const ProductDetails: React.FC = () => {
           <div>
             <div className="glass-panel" style={{ padding: '2rem', background: 'rgba(255, 255, 255, 0.6)', border: '1px solid var(--color-border)', borderRadius: '16px' }}>
               <h3 style={{ color: 'var(--color-primary-dark)', fontSize: '1.25rem', marginBottom: '1.5rem' }}>Submit Customer Review</h3>
-              
+
               {!isAuthenticated ? (
                 <div style={{ textAlign: 'center', padding: '1rem 0' }}>
                   <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', marginBottom: '1.25rem' }}>You must sign in to submit comments or star ratings.</p>
@@ -495,10 +495,10 @@ export const ProductDetails: React.FC = () => {
                           onClick={() => setNewRating(star)}
                           style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                         >
-                          <Star 
-                            size={24} 
-                            color={star <= newRating ? '#ffd700' : 'var(--color-border)'} 
-                            fill={star <= newRating ? '#ffd700' : 'none'} 
+                          <Star
+                            size={24}
+                            color={star <= newRating ? '#ffd700' : 'var(--color-border)'}
+                            fill={star <= newRating ? '#ffd700' : 'none'}
                           />
                         </button>
                       ))}
@@ -519,8 +519,8 @@ export const ProductDetails: React.FC = () => {
                     />
                   </div>
 
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     disabled={reviewLoading}
                     className="btn btn-primary"
                     style={{ padding: '0.75rem', display: 'flex', justifyContent: 'center', gap: '0.5rem' }}
@@ -548,6 +548,93 @@ export const ProductDetails: React.FC = () => {
         }
         @keyframes rotate {
           100% { transform: rotate(360deg); }
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+          .product-details-container {
+            padding: 1rem 0.5rem 3rem 0 !important;
+          }
+          
+          .product-grid {
+            grid-template-columns: 1fr !important;
+            gap: 2rem !important;
+          }
+          
+          .product-image-gallery {
+            order: -1 !important;
+          }
+          
+          .quantity-selector {
+            flex-direction: row !important;
+            width: 100% !important;
+          }
+          
+          .quantity-btn {
+            flex: 1 !important;
+          }
+          
+          .quantity-input {
+            flex: 1 !important;
+            text-align: center !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .product-details-container {
+            padding: 1rem 0 3rem 0 !important;
+          }
+          
+          .back-button {
+            font-size: 0.85rem !important;
+            padding: 0.4rem 0.8rem !important;
+          }
+          
+          .product-title {
+            font-size: 1.5rem !important;
+          }
+          
+          .product-price {
+            font-size: 1.25rem !important;
+          }
+          
+          .thumbnail-grid {
+            grid-template-columns: repeat(4, 1fr) !important;
+            gap: 0.5rem !important;
+          }
+          
+          .thumbnail {
+            height: 60px !important;
+          }
+          
+          .main-image {
+            height: 300px !important;
+          }
+          
+          .tab-buttons {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+          }
+          
+          .tab-button {
+            width: 100% !important;
+            padding: 0.75rem !important;
+            text-align: center !important;
+          }
+          
+          .add-to-cart-button {
+            width: 100% !important;
+            padding: 1rem !important;
+            font-size: 1rem !important;
+          }
+          
+          .review-form {
+            padding: 1rem !important;
+          }
+          
+          .review-card {
+            padding: 1rem !important;
+          }
         }
       `}</style>
     </div>

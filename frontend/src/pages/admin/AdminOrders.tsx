@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import apiClient from '../../services/apiClient';
 import type { Order } from '../../types';
-import { 
-  Search, 
-  Eye, 
-  Edit, 
-  Loader, 
-  X, 
+import {
+  Search,
+  Eye,
+  Edit,
+  Loader,
+  X,
   AlertCircle,
   CheckCircle,
   Truck,
@@ -29,7 +29,7 @@ export const AdminOrders: React.FC = () => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isEditStatusOpen, setIsEditStatusOpen] = useState(false);
-  
+
   // Edit Form states
   const [newOrderStatus, setNewOrderStatus] = useState<Order['orderStatus']>('pending');
   const [trackingNumber, setTrackingNumber] = useState('');
@@ -88,13 +88,13 @@ export const AdminOrders: React.FC = () => {
       setSuccessMsg(`Order status updated successfully!`);
       setIsEditStatusOpen(false);
       setTimeout(() => setSuccessMsg(''), 4000);
-      
+
       // Refresh list
       fetchOrders();
     } catch (err: any) {
       console.error('Error updating order status:', err);
       setModalError(
-        err.response?.data?.message || 
+        err.response?.data?.message ||
         'Failed to update order status. Please verify parameters.'
       );
     } finally {
@@ -149,7 +149,7 @@ export const AdminOrders: React.FC = () => {
 
   return (
     <div className="admin-orders" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-      
+
       {/* Header */}
       <div>
         <h1 style={{ fontSize: '2.25rem', fontWeight: 800, color: 'var(--color-primary-dark)', margin: 0 }}>
@@ -246,8 +246,8 @@ export const AdminOrders: React.FC = () => {
           </select>
 
           {(search || statusFilter) && (
-            <button 
-              onClick={() => { setSearch(''); setStatusFilter(''); }} 
+            <button
+              onClick={() => { setSearch(''); setStatusFilter(''); }}
               style={{
                 background: 'none',
                 border: 'none',
@@ -302,8 +302,8 @@ export const AdminOrders: React.FC = () => {
                   const payStat = getPaymentStatusBadgeStyles(ord.paymentStatus);
 
                   return (
-                    <tr 
-                      key={ord._id} 
+                    <tr
+                      key={ord._id}
                       style={{ borderBottom: '1px solid var(--color-border)', backgroundColor: 'transparent', transition: 'background-color 0.2s' }}
                       onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.4)'}
                       onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
@@ -362,8 +362,8 @@ export const AdminOrders: React.FC = () => {
                       </td>
                       <td style={{ padding: '1rem 1.5rem', textAlign: 'right' }}>
                         <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                          <button 
-                            onClick={() => openDetails(ord)} 
+                          <button
+                            onClick={() => openDetails(ord)}
                             style={{
                               border: 'none',
                               background: 'none',
@@ -376,8 +376,8 @@ export const AdminOrders: React.FC = () => {
                           >
                             <Eye size={16} />
                           </button>
-                          <button 
-                            onClick={() => openEditStatus(ord)} 
+                          <button
+                            onClick={() => openEditStatus(ord)}
                             style={{
                               border: 'none',
                               background: 'none',
@@ -444,8 +444,8 @@ export const AdminOrders: React.FC = () => {
                 </h2>
                 <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>ID: {selectedOrder._id}</span>
               </div>
-              <button 
-                onClick={() => setIsDetailsOpen(false)} 
+              <button
+                onClick={() => setIsDetailsOpen(false)}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)' }}
               >
                 <X size={20} />
@@ -454,7 +454,7 @@ export const AdminOrders: React.FC = () => {
 
             {/* Scrollable details */}
             <div style={{ padding: '2rem', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1.5rem', maxHeight: '65vh' }}>
-              
+
               {/* Order Meta details Grid */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.25rem' }}>
                 <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem' }}>
@@ -537,7 +537,7 @@ export const AdminOrders: React.FC = () => {
                 </h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                   {selectedOrder.items?.map((item, index) => (
-                    <div 
+                    <div
                       key={index}
                       style={{
                         display: 'flex',
@@ -548,9 +548,9 @@ export const AdminOrders: React.FC = () => {
                       }}
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-                        <img 
-                          src={item.image || 'https://via.placeholder.com/40?text=No+Img'} 
-                          alt="" 
+                        <img
+                          src={item.image || 'https://via.placeholder.com/40?text=No+Img'}
+                          alt=""
                           style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '6px', border: '1px solid var(--color-border)' }}
                         />
                         <div>
@@ -631,8 +631,8 @@ export const AdminOrders: React.FC = () => {
               borderTop: '1px solid var(--color-border)',
               backgroundColor: 'rgba(74, 117, 89, 0.02)'
             }}>
-              <button 
-                onClick={() => setIsDetailsOpen(false)} 
+              <button
+                onClick={() => setIsDetailsOpen(false)}
                 className="btn btn-outline"
                 style={{ fontSize: '0.9rem', padding: '0.625rem 1.25rem' }}
               >
@@ -682,8 +682,8 @@ export const AdminOrders: React.FC = () => {
               <h2 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--color-primary-dark)', margin: 0 }}>
                 Update Order #{selectedOrder.orderNumber || selectedOrder._id.slice(-8).toUpperCase()}
               </h2>
-              <button 
-                onClick={() => setIsEditStatusOpen(false)} 
+              <button
+                onClick={() => setIsEditStatusOpen(false)}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--color-text-muted)' }}
               >
                 <X size={20} />
@@ -693,7 +693,7 @@ export const AdminOrders: React.FC = () => {
             {/* Form */}
             <form onSubmit={handleStatusUpdateSubmit} style={{ display: 'flex', flexDirection: 'column' }}>
               <div style={{ padding: '2rem', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                
+
                 {modalError && (
                   <div style={{
                     padding: '0.75rem 1rem',
@@ -788,6 +788,81 @@ export const AdminOrders: React.FC = () => {
         </div>
       )}
 
+      {/* Mobile Responsive Styles */}
+      <style>{`
+        @media (max-width: 768px) {
+          .orders-header {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 1rem !important;
+          }
+          
+          .filter-bar {
+            width: 100% !important;
+            flex-direction: column !important;
+            gap: 0.75rem !important;
+          }
+          
+          .filter-select {
+            width: 100% !important;
+          }
+          
+          .orders-table {
+            font-size: 0.85rem !important;
+          }
+          
+          .orders-table th,
+          .orders-table td {
+            padding: 0.75rem 0.5rem !important;
+          }
+          
+          .order-details {
+            padding: 1.5rem !important;
+          }
+          
+          .order-info-grid {
+            grid-template-columns: 1fr !important;
+            gap: 1rem !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .orders-table-container {
+            overflow-x: auto !important;
+          }
+          
+          .orders-table {
+            min-width: 700px !important;
+          }
+          
+          .status-badge {
+            font-size: 0.75rem !important;
+            padding: 0.25rem 0.5rem !important;
+          }
+          
+          .action-buttons {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+          }
+          
+          .action-button {
+            width: 100% !important;
+            justify-content: center !important;
+          }
+          
+          .modal-content {
+            width: 95% !important;
+            max-height: 90vh !important;
+            margin: 5vh auto !important;
+          }
+          
+          .order-item {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 0.5rem !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };

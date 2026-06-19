@@ -548,6 +548,59 @@ export const Checkout: React.FC = () => {
         @media (max-width: 768px) {
           .grid-2 { grid-template-columns: 1fr !important; }
         }
+
+        /* Enhanced Mobile Responsiveness */
+        @media (max-width: 768px) {
+          .checkout-container {
+            padding: 1rem 0.5rem 3rem 0 !important;
+          }
+          
+          .checkout-card {
+            padding: 1.5rem !important;
+          }
+          
+          .step-indicator {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+          }
+          
+          .step-item {
+            width: 100% !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .checkout-container {
+            padding: 1rem 0 3rem 0 !important;
+          }
+          
+          .checkout-card {
+            padding: 1rem !important;
+          }
+          
+          .form-row {
+            flex-direction: column !important;
+            gap: 1rem !important;
+          }
+          
+          .form-row > div {
+            width: 100% !important;
+          }
+          
+          .place-order-button {
+            width: 100% !important;
+            padding: 1rem !important;
+            font-size: 1rem !important;
+          }
+          
+          .order-summary {
+            padding: 1rem !important;
+          }
+          
+          .summary-item {
+            font-size: 0.85rem !important;
+          }
+        }
       `}</style>
     </div>
   );

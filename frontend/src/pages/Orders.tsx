@@ -7,11 +7,11 @@ import {
 } from 'lucide-react';
 
 const ORDER_STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
-  pending:    { label: 'Pending',     color: 'hsl(40,70%,45%)',   icon: <Clock size={14} /> },
-  processing: { label: 'Processing',  color: 'hsl(210,80%,50%)',  icon: <Loader size={14} /> },
-  shipped:    { label: 'Shipped',     color: 'hsl(200,70%,40%)',  icon: <Truck size={14} /> },
-  delivered:  { label: 'Delivered',   color: 'hsl(140,40%,40%)',  icon: <CheckCircle size={14} /> },
-  cancelled:  { label: 'Cancelled',   color: 'hsl(0,60%,50%)',    icon: <XCircle size={14} /> },
+  pending: { label: 'Pending', color: 'hsl(40,70%,45%)', icon: <Clock size={14} /> },
+  processing: { label: 'Processing', color: 'hsl(210,80%,50%)', icon: <Loader size={14} /> },
+  shipped: { label: 'Shipped', color: 'hsl(200,70%,40%)', icon: <Truck size={14} /> },
+  delivered: { label: 'Delivered', color: 'hsl(140,40%,40%)', icon: <CheckCircle size={14} /> },
+  cancelled: { label: 'Cancelled', color: 'hsl(0,60%,50%)', icon: <XCircle size={14} /> },
 };
 
 const PAYMENT_STATUS_LABELS: Record<string, string> = {
@@ -146,6 +146,63 @@ export const Orders: React.FC = () => {
           })}
         </div>
       )}
+
+      {/* Mobile Responsive Styles */}
+      <style>{`
+        @media (max-width: 768px) {
+          .orders-container {
+            padding: 1rem 0.5rem 3rem 0 !important;
+          }
+          
+          .order-card {
+            padding: 1.25rem !important;
+            gap: 1rem !important;
+          }
+          
+          .order-header {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 0.5rem !important;
+          }
+          
+          .order-items-preview {
+            font-size: 0.85rem !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .orders-container {
+            padding: 1rem 0 3rem 0 !important;
+          }
+          
+          .order-card {
+            padding: 1rem !important;
+          }
+          
+          .order-id {
+            font-size: 0.85rem !important;
+          }
+          
+          .order-date {
+            font-size: 0.8rem !important;
+          }
+          
+          .order-total {
+            font-size: 1rem !important;
+          }
+          
+          .status-badge {
+            font-size: 0.75rem !important;
+            padding: 0.25rem 0.5rem !important;
+          }
+          
+          .view-order-button {
+            width: 100% !important;
+            justify-content: center !important;
+            margin-top: 0.75rem !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };

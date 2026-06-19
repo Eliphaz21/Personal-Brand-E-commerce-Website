@@ -247,6 +247,43 @@ export const ChangePassword: React.FC = () => {
       <style>{`
         .spin-animation { animation: rotate 1.5s linear infinite; }
         @keyframes rotate { 100% { transform: rotate(360deg); } }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+          .change-password-container {
+            padding: 1rem 0.5rem 3rem 0 !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .change-password-container {
+            padding: 1rem 0 3rem 0 !important;
+            min-height: calc(100vh - 60px) !important;
+          }
+          
+          .glass-panel {
+            padding: 2rem 1.5rem !important;
+            border-radius: 16px !important;
+          }
+          
+          h1 {
+            font-size: 1.5rem !important;
+          }
+          
+          .form-input {
+            padding: 0.75rem 1rem !important;
+            font-size: 0.9rem !important;
+          }
+          
+          .btn {
+            padding: 0.75rem 1rem !important;
+            font-size: 0.9rem !important;
+          }
+          
+          .otp-input {
+            font-size: 1.25rem !important;
+          }
+        }
       `}</style>
     </div>
   );

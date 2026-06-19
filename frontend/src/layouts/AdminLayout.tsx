@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Menu, X } from 'lucide-react';
 
 export const AdminLayout: React.FC = () => {
   const location = useLocation();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const navItems = [
     { path: '/admin', label: 'Overview' },
@@ -15,7 +16,31 @@ export const AdminLayout: React.FC = () => {
 
   return (
     <div className="admin-layout" style={{ display: 'flex', minHeight: 'calc(100vh - 80px)', marginTop: '80px' }}>
-      <aside className="admin-sidebar" style={{
+      {/* Mobile Menu Button */}
+      <button
+        className="admin-mobile-menu-btn"
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        style={{
+          display: 'none',
+          position: 'fixed',
+          top: '90px',
+          left: '1rem',
+          zIndex: 1001,
+          background: 'var(--color-primary)',
+          color: 'white',
+          border: 'none',
+          borderRadius: '8px',
+          padding: '0.75rem',
+          cursor: 'pointer',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+        }}
+        aria-label="Toggle admin menu"
+      >
+        {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+      </button>
+
+      {/* Sidebar */}
+      <aside className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`} style={{
         width: '260px',
         background: 'var(--color-glass)',
         backdropFilter: 'blur(10px)',
@@ -53,6 +78,7 @@ export const AdminLayout: React.FC = () => {
             e.currentTarget.style.color = 'var(--color-primary-dark)';
             e.currentTarget.style.borderColor = 'var(--color-border)';
           }}
+          onClick={() => setSidebarOpen(false)}
         >
           <ArrowLeft size={16} />
           Back to Store
@@ -66,6 +92,7 @@ export const AdminLayout: React.FC = () => {
               key={item.path}
               to={item.path}
               className={`admin-nav-item ${isActive ? 'active' : ''}`}
+              onClick={() => setSidebarOpen(false)}
               style={{
                 display: 'block',
                 padding: '0.75rem 1rem',
@@ -85,6 +112,44 @@ export const AdminLayout: React.FC = () => {
       <main className="admin-content" style={{ flex: 1, padding: '2rem', backgroundColor: 'rgba(255, 255, 255, 0.4)' }}>
         <Outlet />
       </main>
+
+      {/* Mobile Responsive Styles */}
+      <style>{`
+        @media (max-width: 768px) {
+          .admin-mobile-menu-btn {
+            display: flex !important;
+          }
+          
+          .admin-sidebar {
+            position: fixed !important;
+            top: '80px' !important;
+            left: 0 !important;
+            bottom: 0 !important;
+            z-index: 1000 !important;
+            transform: translateX(-100%) !important;
+            transition: transform 0.3s ease !important;
+          }
+          
+          .admin-sidebar.open {
+            transform: translateX(0) !important;
+          }
+          
+          .admin-content {
+            padding: 1.5rem 1rem !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .admin-content {
+            padding: 1rem 0.5rem !important;
+          }
+          
+          .admin-sidebar {
+            width: 280px !important;
+            padding: 1rem !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };

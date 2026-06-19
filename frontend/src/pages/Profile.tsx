@@ -17,11 +17,11 @@ interface ProfileEditForm {
 }
 
 const ORDER_STATUS_CONFIG: Record<string, { label: string; color: string; icon: React.ReactNode }> = {
-  pending:    { label: 'Pending',     color: 'hsl(40,70%,45%)',    icon: <Clock size={14} /> },
-  processing: { label: 'Processing',  color: 'hsl(210,80%,50%)',   icon: <Loader size={14} /> },
-  shipped:    { label: 'Shipped',     color: 'hsl(200,70%,40%)',   icon: <Truck size={14} /> },
-  delivered:  { label: 'Delivered',   color: 'hsl(140,40%,40%)',   icon: <CheckCircle size={14} /> },
-  cancelled:  { label: 'Cancelled',   color: 'hsl(0,60%,50%)',     icon: <XCircle size={14} /> },
+  pending: { label: 'Pending', color: 'hsl(40,70%,45%)', icon: <Clock size={14} /> },
+  processing: { label: 'Processing', color: 'hsl(210,80%,50%)', icon: <Loader size={14} /> },
+  shipped: { label: 'Shipped', color: 'hsl(200,70%,40%)', icon: <Truck size={14} /> },
+  delivered: { label: 'Delivered', color: 'hsl(140,40%,40%)', icon: <CheckCircle size={14} /> },
+  cancelled: { label: 'Cancelled', color: 'hsl(0,60%,50%)', icon: <XCircle size={14} /> },
 };
 
 export const Profile: React.FC = () => {
@@ -252,7 +252,7 @@ export const Profile: React.FC = () => {
       <div style={{ display: 'flex', borderBottom: '1px solid var(--color-border)', marginBottom: '2rem', gap: '0' }}>
         {([
           { key: 'account', label: 'Account Details', icon: <User size={16} /> },
-          { key: 'orders',  label: 'My Orders',       icon: <Package size={16} /> },
+          { key: 'orders', label: 'My Orders', icon: <Package size={16} /> },
         ] as const).map(tab => (
           <button
             key={tab.key}
@@ -279,11 +279,11 @@ export const Profile: React.FC = () => {
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <tbody>
               {[
-                { label: 'Full Name',       value: user?.name },
-                { label: 'Email Address',   value: user?.email },
-                { label: 'Account Role',    value: user?.role === 'admin' ? 'Administrator' : 'Customer' },
-                { label: 'Email Verified',  value: user?.isVerified ? '✓ Verified' : '✗ Not Verified' },
-                { label: 'Member Since',    value: user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A' },
+                { label: 'Full Name', value: user?.name },
+                { label: 'Email Address', value: user?.email },
+                { label: 'Account Role', value: user?.role === 'admin' ? 'Administrator' : 'Customer' },
+                { label: 'Email Verified', value: user?.isVerified ? '✓ Verified' : '✗ Not Verified' },
+                { label: 'Member Since', value: user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'N/A' },
               ].map(row => (
                 <tr key={row.label} style={{ borderBottom: '1px solid var(--color-border)' }}>
                   <td style={{ padding: '1rem 0.5rem', fontWeight: 600, color: 'var(--color-primary-dark)', width: '40%', fontSize: '0.9rem' }}>
@@ -423,6 +423,102 @@ export const Profile: React.FC = () => {
       <style>{`
         .spin-animation { animation: rotate 1.5s linear infinite; }
         @keyframes rotate { 100% { transform: rotate(360deg); } }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+          .profile-container {
+            padding: 1rem 0.5rem 3rem 0 !important;
+          }
+          
+          .profile-header {
+            flex-direction: column !important;
+            text-align: center !important;
+            gap: 1.5rem !important;
+          }
+          
+          .profile-avatar {
+            width: 120px !important;
+            height: 120px !important;
+          }
+          
+          .tab-buttons {
+            flex-wrap: wrap !important;
+            gap: 0.5rem !important;
+          }
+          
+          .tab-button {
+            flex: 1 !important;
+            min-width: 120px !important;
+            font-size: 0.85rem !important;
+            padding: 0.5rem 0.75rem !important;
+          }
+          
+          .account-table td {
+            padding: 0.75rem 0.5rem !important;
+            font-size: 0.85rem !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .profile-container {
+            padding: 1rem 0 3rem 0 !important;
+          }
+          
+          .profile-content {
+            grid-template-columns: 1fr !important;
+            gap: 1.5rem !important;
+          }
+          
+          .profile-avatar {
+            width: 100px !important;
+            height: 100px !important;
+          }
+          
+          .profile-name {
+            font-size: 1.25rem !important;
+          }
+          
+          .profile-email {
+            font-size: 0.85rem !important;
+          }
+          
+          .tab-buttons {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+          }
+          
+          .tab-button {
+            width: 100% !important;
+          }
+          
+          .glass-panel {
+            padding: 1.5rem 1rem !important;
+          }
+          
+          .account-table {
+            font-size: 0.8rem !important;
+          }
+          
+          .account-table td {
+            padding: 0.5rem 0.25rem !important;
+          }
+          
+          .order-card {
+            padding: 1rem !important;
+          }
+          
+          .order-card-header {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 0.5rem !important;
+          }
+          
+          .view-order-link {
+            width: 100% !important;
+            justify-content: center !important;
+            margin-top: 0.75rem !important;
+          }
+        }
       `}</style>
     </div>
   );

@@ -489,6 +489,72 @@ export const ProductCatalog: React.FC = () => {
         .product-card:hover .product-img {
           transform: scale(1.05);
         }
+
+        /* Enhanced Mobile Responsiveness */
+        @media (max-width: 768px) {
+          .catalog-page {
+            padding: 1rem 0.5rem 3rem 0 !important;
+          }
+          
+          .filter-toggle-btn {
+            padding: 0.5rem 1rem !important;
+            font-size: 0.85rem !important;
+          }
+          
+          .catalog-sidebar {
+            width: 100% !important;
+            max-width: 320px !important;
+          }
+          
+          .product-card {
+            padding: 1rem !important;
+          }
+          
+          .product-img {
+            height: 200px !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .catalog-page {
+            padding: 1rem 0 3rem 0 !important;
+          }
+          
+          .top-bar-container {
+            flex-direction: column !important;
+            align-items: stretch !important;
+            gap: 1rem !important;
+          }
+          
+          .search-input {
+            width: 100% !important;
+          }
+          
+          .sort-select {
+            width: 100% !important;
+          }
+          
+          .product-grid {
+            grid-template-columns: 1fr !important;
+            gap: 1rem !important;
+          }
+          
+          .product-card {
+            padding: 0.75rem !important;
+          }
+          
+          .product-img {
+            height: 180px !important;
+          }
+          
+          .product-title {
+            font-size: 0.9rem !important;
+          }
+          
+          .product-price {
+            font-size: 1rem !important;
+          }
+        }
       `}</style>
     </div>
   );

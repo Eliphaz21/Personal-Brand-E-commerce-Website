@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import apiClient from '../../services/apiClient';
-import { 
-  Search, 
-  Send, 
-  Trash2, 
-  Loader, 
+import {
+  Search,
+  Send,
+  Trash2,
+  Loader,
   AlertCircle,
   CheckCircle,
   Clock,
@@ -157,12 +157,12 @@ export const AdminInbox: React.FC = () => {
     setSelectedMessage(msg);
     setReplyText('');
     setReplyError('');
-    
+
     // If message is unread, mark it as read automatically
     if (msg.status === 'unread') {
       try {
         await apiClient.patch(`/messages/${msg._id}/read`);
-        
+
         // Update local state status to read
         setMessages(prev => prev.map(m => m._id === msg._id ? { ...m, status: 'read' } : m));
         setSelectedMessage(prev => prev && prev._id === msg._id ? { ...prev, status: 'read' } : prev);
@@ -188,16 +188,16 @@ export const AdminInbox: React.FC = () => {
         adminReply: replyText.trim()
       });
 
-      const updatedMsg = res.data?.data?.message || res.data?.message || { 
-        ...selectedMessage, 
-        status: 'replied', 
+      const updatedMsg = res.data?.data?.message || res.data?.message || {
+        ...selectedMessage,
+        status: 'replied',
         adminReply: replyText.trim(),
         repliedAt: new Date().toISOString()
       };
 
       setSuccessMsg('Reply email sent successfully!');
       setReplyText('');
-      
+
       // Update states
       setMessages(prev => prev.map(m => m._id === selectedMessage._id ? updatedMsg : m));
       setSelectedMessage(updatedMsg);
@@ -205,7 +205,7 @@ export const AdminInbox: React.FC = () => {
     } catch (err: any) {
       console.error('Error replying to message:', err);
       setReplyError(
-        err.response?.data?.message || 
+        err.response?.data?.message ||
         'Failed to deliver email reply. Check SMTP settings.'
       );
     } finally {
@@ -224,11 +224,11 @@ export const AdminInbox: React.FC = () => {
       await apiClient.delete(`/messages/${id}`);
       setSuccessMsg('Message deleted successfully.');
       setTimeout(() => setSuccessMsg(''), 4000);
-      
+
       if (selectedMessage?._id === id) {
         setSelectedMessage(null);
       }
-      
+
       setMessages(prev => prev.filter(m => m._id !== id));
     } catch (err: any) {
       console.error('Error deleting message:', err);
@@ -246,7 +246,7 @@ export const AdminInbox: React.FC = () => {
 
   return (
     <div className="admin-inbox" style={{ display: 'flex', flexDirection: 'column', gap: '2rem', height: 'calc(100vh - 120px)' }}>
-      
+
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
@@ -424,7 +424,7 @@ export const AdminInbox: React.FC = () => {
         minHeight: 0, // Allows child panels to scroll independently
         alignItems: 'stretch'
       }}>
-        
+
         {/* LEFT PANEL: MESSAGE LIST */}
         <div className="glass-panel" style={{
           flex: '0 0 400px',
@@ -454,7 +454,7 @@ export const AdminInbox: React.FC = () => {
                 }}
               />
             </div>
-            
+
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
               {[
                 { value: '', label: 'All' },
@@ -521,7 +521,7 @@ export const AdminInbox: React.FC = () => {
             ) : (
               filteredMessages.map((msg) => {
                 const isSelected = selectedMessage?._id === msg._id;
-                
+
                 return (
                   <div
                     key={msg._id}
@@ -530,10 +530,10 @@ export const AdminInbox: React.FC = () => {
                       padding: '1.25rem',
                       borderBottom: '1px solid var(--color-border)',
                       cursor: 'pointer',
-                      backgroundColor: isSelected 
-                        ? 'rgba(74, 117, 89, 0.06)' 
-                        : msg.status === 'unread' 
-                          ? 'rgba(255,255,255,0.85)' 
+                      backgroundColor: isSelected
+                        ? 'rgba(74, 117, 89, 0.06)'
+                        : msg.status === 'unread'
+                          ? 'rgba(255,255,255,0.85)'
                           : 'rgba(255,255,255,0.4)',
                       transition: 'background-color 0.2s',
                       position: 'relative'
@@ -543,8 +543,8 @@ export const AdminInbox: React.FC = () => {
                     }}
                     onMouseLeave={(e) => {
                       if (!isSelected) {
-                        e.currentTarget.style.backgroundColor = msg.status === 'unread' 
-                          ? 'rgba(255,255,255,0.85)' 
+                        e.currentTarget.style.backgroundColor = msg.status === 'unread'
+                          ? 'rgba(255,255,255,0.85)'
                           : 'rgba(255,255,255,0.4)';
                       }
                     }}
@@ -601,21 +601,21 @@ export const AdminInbox: React.FC = () => {
                         fontSize: '0.65rem',
                         fontWeight: 700,
                         textTransform: 'uppercase',
-                        backgroundColor: msg.status === 'replied' 
-                          ? 'rgba(39, 174, 96, 0.1)' 
-                          : msg.status === 'read' 
-                            ? 'rgba(120, 120, 120, 0.15)' 
+                        backgroundColor: msg.status === 'replied'
+                          ? 'rgba(39, 174, 96, 0.1)'
+                          : msg.status === 'read'
+                            ? 'rgba(120, 120, 120, 0.15)'
                             : 'rgba(212, 163, 115, 0.15)',
-                        color: msg.status === 'replied' 
-                          ? 'var(--color-success)' 
-                          : msg.status === 'read' 
-                            ? 'var(--color-text-muted)' 
+                        color: msg.status === 'replied'
+                          ? 'var(--color-success)'
+                          : msg.status === 'read'
+                            ? 'var(--color-text-muted)'
                             : 'var(--color-secondary)'
                       }}>
                         {msg.status}
                       </span>
 
-                      <button 
+                      <button
                         onClick={(e) => handleDeleteMessage(msg._id, e)}
                         style={{
                           border: 'none',
@@ -651,7 +651,7 @@ export const AdminInbox: React.FC = () => {
         }}>
           {selectedMessage ? (
             <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
-              
+
               {/* Message Header info */}
               <div style={{ padding: '1.5rem 2rem', borderBottom: '1px solid var(--color-border)', backgroundColor: 'rgba(74, 117, 89, 0.02)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1rem' }}>
@@ -842,6 +842,91 @@ export const AdminInbox: React.FC = () => {
 
       </div>
 
+      {/* Mobile Responsive Styles */}
+      <style>{`
+        @media (max-width: 768px) {
+          .inbox-layout {
+            flex-direction: column !important;
+          }
+          
+          .inbox-sidebar {
+            width: 100% !important;
+            border-right: none !important;
+            border-bottom: 1px solid var(--color-border) !important;
+            max-height: 300px !important;
+          }
+          
+          .inbox-content {
+            flex: 1 !important;
+          }
+          
+          .message-list {
+            max-height: 250px !important;
+          }
+          
+          .tab-buttons {
+            flex-wrap: wrap !important;
+            gap: 0.5rem !important;
+          }
+          
+          .tab-button {
+            flex: 1 !important;
+            min-width: 120px !important;
+            font-size: 0.85rem !important;
+            padding: 0.5rem 0.75rem !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .stats-bar {
+            flex-direction: column !important;
+            gap: 0.5rem !important;
+            align-items: flex-start !important;
+          }
+          
+          .stat-pill {
+            width: 100% !important;
+            justify-content: center !important;
+          }
+          
+          .search-bar {
+            width: 100% !important;
+          }
+          
+          .message-item {
+            padding: 0.75rem !important;
+          }
+          
+          .message-subject {
+            font-size: 0.9rem !important;
+          }
+          
+          .message-preview {
+            font-size: 0.8rem !important;
+          }
+          
+          .reply-form {
+            padding: 1rem !important;
+          }
+          
+          .reply-textarea {
+            min-height: 100px !important;
+          }
+          
+          .send-button {
+            width: 100% !important;
+            justify-content: center !important;
+          }
+          
+          .subscriber-item {
+            padding: 0.75rem !important;
+          }
+          
+          .subscriber-email {
+            font-size: 0.85rem !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };

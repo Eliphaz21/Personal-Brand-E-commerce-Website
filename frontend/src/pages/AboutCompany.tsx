@@ -460,6 +460,107 @@ const AboutCompany: React.FC = () => {
           0% { left: -100%; }
           100% { left: 200%; }
         }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+          .about-page section {
+            padding: 4rem 0 !important;
+          }
+          
+          .hero-section {
+            padding: 5rem 0 4rem 0 !important;
+          }
+          
+          .grid-2 {
+            grid-template-columns: 1fr !important;
+            gap: 2rem !important;
+          }
+          
+          .grid-3 {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 1.5rem !important;
+          }
+          
+          .grid-4 {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 1.5rem !important;
+          }
+          
+          .profile-card {
+            maxWidth: 100% !important;
+          }
+          
+          .stats-container {
+            flex-wrap: wrap !important;
+            gap: 1rem !important;
+          }
+          
+          .expertise-card {
+            minHeight: 240px !important;
+            padding: 2rem 1.5rem !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .about-page section {
+            padding: 3rem 0 !important;
+          }
+          
+          .hero-section {
+            padding: 4rem 0 3rem 0 !important;
+          }
+          
+          h1 {
+            font-size: 2rem !important;
+          }
+          
+          h2 {
+            font-size: 1.5rem !important;
+          }
+          
+          .grid-3,
+          .grid-4 {
+            grid-template-columns: 1fr !important;
+            gap: 1.25rem !important;
+          }
+          
+          .stats-container {
+            flex-direction: column !important;
+            width: 100% !important;
+          }
+          
+          .stat-item {
+            width: 100% !important;
+          }
+          
+          .affiliate-buttons {
+            flex-direction: column !important;
+            gap: 0.75rem !important;
+          }
+          
+          .affiliate-button {
+            width: 100% !important;
+            justify-content: center !important;
+          }
+          
+          .social-card {
+            padding: 1.5rem 1rem !important;
+          }
+          
+          .cta-section {
+            padding: 3rem 1.5rem !important;
+          }
+          
+          .cta-buttons {
+            flex-direction: column !important;
+            gap: 0.75rem !important;
+          }
+          
+          .cta-button {
+            width: 100% !important;
+            justify-content: center !important;
+          }
+        }
       `}</style>
     </div>
   );

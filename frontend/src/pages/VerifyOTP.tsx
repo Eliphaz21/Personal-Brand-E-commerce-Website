@@ -15,7 +15,7 @@ export const VerifyOTP: React.FC = () => {
   const [info, setInfo] = useState('');
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
-  
+
   // Timer state for resend code cooldown
   const [cooldown, setCooldown] = useState(60);
 
@@ -46,8 +46,8 @@ export const VerifyOTP: React.FC = () => {
     } catch (err: any) {
       console.error('OTP Verification error:', err);
       setError(
-        err.response?.data?.message || 
-        err.response?.data?.error || 
+        err.response?.data?.message ||
+        err.response?.data?.error ||
         'Incorrect or expired OTP code. Please check your email.'
       );
     } finally {
@@ -57,7 +57,7 @@ export const VerifyOTP: React.FC = () => {
 
   const handleResend = async () => {
     if (cooldown > 0 || !email) return;
-    
+
     setError('');
     setInfo('');
     setResending(true);
@@ -69,8 +69,8 @@ export const VerifyOTP: React.FC = () => {
     } catch (err: any) {
       console.error('OTP Resend error:', err);
       setError(
-        err.response?.data?.message || 
-        err.response?.data?.error || 
+        err.response?.data?.message ||
+        err.response?.data?.error ||
         'Failed to resend code. Please try again.'
       );
     } finally {
@@ -174,10 +174,10 @@ export const VerifyOTP: React.FC = () => {
             />
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={loading || otp.length !== 6}
-            className="btn btn-primary" 
+            className="btn btn-primary"
             style={{ width: '100%', padding: '0.875rem', marginTop: '1rem', display: 'flex', justifyContent: 'center', gap: '0.5rem' }}
           >
             {loading ? (
@@ -208,6 +208,43 @@ export const VerifyOTP: React.FC = () => {
         }
         @keyframes rotate {
           100% { transform: rotate(360deg); }
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+          .verify-otp-container {
+            padding: 1rem 0.5rem 3rem 0 !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .verify-otp-container {
+            padding: 1rem 0 3rem 0 !important;
+            min-height: calc(100vh - 60px) !important;
+          }
+          
+          .glass-panel {
+            padding: 2rem 1.5rem !important;
+            border-radius: 16px !important;
+          }
+          
+          h1 {
+            font-size: 1.5rem !important;
+          }
+          
+          .form-input {
+            padding: 0.75rem 1rem !important;
+            font-size: 0.9rem !important;
+          }
+          
+          .btn {
+            padding: 0.75rem 1rem !important;
+            font-size: 0.9rem !important;
+          }
+          
+          .otp-input {
+            font-size: 1.25rem !important;
+          }
         }
       `}</style>
     </div>

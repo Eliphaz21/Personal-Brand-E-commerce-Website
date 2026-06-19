@@ -1,23 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import apiClient from '../../services/apiClient';
-import { 
-  TrendingUp, 
-  ShoppingBag, 
-  Users, 
-  Package, 
-  AlertTriangle, 
+import {
+  TrendingUp,
+  ShoppingBag,
+  Users,
+  Package,
+  AlertTriangle,
   DollarSign,
   Loader,
   RefreshCw
 } from 'lucide-react';
-import { 
-  ResponsiveContainer, 
-  AreaChart, 
-  Area, 
-  XAxis, 
-  YAxis, 
-  Tooltip, 
-  CartesianGrid 
+import {
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid
 } from 'recharts';
 
 interface DashboardStats {
@@ -122,7 +122,7 @@ export const AdminOverview: React.FC = () => {
 
   return (
     <div className="admin-overview" style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
-      
+
       {/* Header with Title and Refresh */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
@@ -133,7 +133,7 @@ export const AdminOverview: React.FC = () => {
             Real-time analytics, key metrics, and inventory alerts.
           </p>
         </div>
-        
+
         <button
           onClick={handleRefresh}
           disabled={refreshing}
@@ -191,14 +191,14 @@ export const AdminOverview: React.FC = () => {
           transition: 'transform 0.3s ease, box-shadow 0.3s ease',
           cursor: 'default'
         }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = 'translateY(-4px)';
-          e.currentTarget.style.boxShadow = '0 10px 20px rgba(0,0,0,0.05)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = 'translateY(0)';
-          e.currentTarget.style.boxShadow = 'none';
-        }}>
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-4px)';
+            e.currentTarget.style.boxShadow = '0 10px 20px rgba(0,0,0,0.05)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = 'none';
+          }}>
           <div style={{
             width: '48px',
             height: '48px',
@@ -231,14 +231,14 @@ export const AdminOverview: React.FC = () => {
           transition: 'transform 0.3s ease, box-shadow 0.3s ease',
           cursor: 'default'
         }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = 'translateY(-4px)';
-          e.currentTarget.style.boxShadow = '0 10px 20px rgba(0,0,0,0.05)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = 'translateY(0)';
-          e.currentTarget.style.boxShadow = 'none';
-        }}>
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-4px)';
+            e.currentTarget.style.boxShadow = '0 10px 20px rgba(0,0,0,0.05)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = 'none';
+          }}>
           <div style={{
             width: '48px',
             height: '48px',
@@ -271,14 +271,14 @@ export const AdminOverview: React.FC = () => {
           transition: 'transform 0.3s ease, box-shadow 0.3s ease',
           cursor: 'default'
         }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = 'translateY(-4px)';
-          e.currentTarget.style.boxShadow = '0 10px 20px rgba(0,0,0,0.05)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = 'translateY(0)';
-          e.currentTarget.style.boxShadow = 'none';
-        }}>
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-4px)';
+            e.currentTarget.style.boxShadow = '0 10px 20px rgba(0,0,0,0.05)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = 'none';
+          }}>
           <div style={{
             width: '48px',
             height: '48px',
@@ -311,14 +311,14 @@ export const AdminOverview: React.FC = () => {
           transition: 'transform 0.3s ease, box-shadow 0.3s ease',
           cursor: 'default'
         }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = 'translateY(-4px)';
-          e.currentTarget.style.boxShadow = '0 10px 20px rgba(0,0,0,0.05)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = 'translateY(0)';
-          e.currentTarget.style.boxShadow = 'none';
-        }}>
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'translateY(-4px)';
+            e.currentTarget.style.boxShadow = '0 10px 20px rgba(0,0,0,0.05)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'translateY(0)';
+            e.currentTarget.style.boxShadow = 'none';
+          }}>
           <div style={{
             width: '48px',
             height: '48px',
@@ -362,7 +362,7 @@ export const AdminOverview: React.FC = () => {
               Monthly Revenue (USD)
             </span>
           </div>
-          
+
           <div style={{ width: '100%', height: 350 }}>
             {chartData.length === 0 ? (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--color-text-muted)', fontStyle: 'italic' }}>
@@ -376,40 +376,40 @@ export const AdminOverview: React.FC = () => {
                 >
                   <defs>
                     <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.4}/>
-                      <stop offset="95%" stopColor="var(--color-primary)" stopOpacity={0.0}/>
+                      <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="var(--color-primary)" stopOpacity={0.0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,0.06)" />
-                  <XAxis 
-                    dataKey="month" 
-                    tick={{ fill: 'var(--color-text-muted)', fontSize: 11, fontWeight: 500 }} 
+                  <XAxis
+                    dataKey="month"
+                    tick={{ fill: 'var(--color-text-muted)', fontSize: 11, fontWeight: 500 }}
                     axisLine={false}
                     tickLine={false}
                   />
-                  <YAxis 
+                  <YAxis
                     tick={{ fill: 'var(--color-text-muted)', fontSize: 11, fontWeight: 500 }}
                     axisLine={false}
                     tickLine={false}
                     tickFormatter={(val) => `$${val}`}
                   />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#fff', 
-                      border: '1px solid var(--color-border)', 
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#fff',
+                      border: '1px solid var(--color-border)',
                       borderRadius: '12px',
                       boxShadow: '0 8px 16px rgba(0,0,0,0.05)',
                       fontFamily: 'inherit'
                     }}
                     formatter={(value: any) => [`$${parseFloat(value).toFixed(2)}`, 'Revenue']}
                   />
-                  <Area 
-                    type="monotone" 
-                    dataKey="revenue" 
-                    stroke="var(--color-primary-dark)" 
+                  <Area
+                    type="monotone"
+                    dataKey="revenue"
+                    stroke="var(--color-primary-dark)"
                     strokeWidth={2.5}
-                    fillOpacity={1} 
-                    fill="url(#colorRevenue)" 
+                    fillOpacity={1}
+                    fill="url(#colorRevenue)"
                   />
                 </AreaChart>
               </ResponsiveContainer>
@@ -445,7 +445,7 @@ export const AdminOverview: React.FC = () => {
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
               {lowStock.map((prod) => (
-                <div 
+                <div
                   key={prod._id}
                   style={{
                     display: 'flex',
@@ -467,12 +467,12 @@ export const AdminOverview: React.FC = () => {
                       SKU: {prod.sku || 'N/A'}
                     </span>
                   </div>
-                  
+
                   <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
                     <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>
                       Price: {formatCurrency(prod.price)}
                     </span>
-                    
+
                     <span style={{
                       padding: '0.35rem 0.75rem',
                       borderRadius: '999px',
@@ -490,7 +490,67 @@ export const AdminOverview: React.FC = () => {
           )}
         </div>
       </div>
-      
+
+      {/* Mobile Responsive Styles */}
+      <style>{`
+        @media (max-width: 768px) {
+          .stats-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 1rem !important;
+          }
+          
+          .chart-container {
+            height: 300px !important;
+          }
+          
+          .low-stock-item {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 0.75rem !important;
+          }
+          
+          .low-stock-item > div:last-child {
+            width: 100% !important;
+            justify-content: space-between !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .stats-grid {
+            grid-template-columns: 1fr !important;
+            gap: 0.75rem !important;
+          }
+          
+          .stat-card {
+            padding: 1rem !important;
+          }
+          
+          .chart-container {
+            height: 250px !important;
+          }
+          
+          .section-header {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 0.5rem !important;
+          }
+          
+          .refresh-button {
+            width: 100% !important;
+            justify-content: center !important;
+          }
+          
+          .low-stock-item {
+            padding: 0.875rem 1rem !important;
+          }
+          
+          .low-stock-item > div:last-child {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 0.5rem !important;
+          }
+        }
+      `}</style>
     </div>
   );
 };

@@ -6,13 +6,13 @@ import apiClient from '../services/apiClient';
 import { ShoppingBag, ArrowRight, Trash2, Plus, Minus, Tag, AlertCircle, CheckCircle, Loader } from 'lucide-react';
 
 export const Cart: React.FC = () => {
-  const { 
-    cartItems, 
-    isLoading, 
-    totalPrice, 
-    updateCartItemQuantity, 
-    removeFromCart, 
-    clearCart 
+  const {
+    cartItems,
+    isLoading,
+    totalPrice,
+    updateCartItemQuantity,
+    removeFromCart,
+    clearCart
   } = useCart();
 
   const navigate = useNavigate();
@@ -58,17 +58,17 @@ export const Cart: React.FC = () => {
   const handleApplyCoupon = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!couponCode.trim()) return;
-    
+
     setCouponLoading(true);
     setCouponError('');
     setCouponSuccess('');
-    
+
     try {
       const response = await apiClient.post('/coupons/validate', {
         code: couponCode,
         subtotal: totalPrice
       });
-      
+
       const validatedCoupon = response.data?.coupon;
       if (validatedCoupon) {
         setAppliedCoupon(validatedCoupon);
@@ -78,8 +78,8 @@ export const Cart: React.FC = () => {
     } catch (err: any) {
       console.error('Coupon validation error:', err);
       setCouponError(
-        err.response?.data?.message || 
-        err.response?.data?.error || 
+        err.response?.data?.message ||
+        err.response?.data?.error ||
         'Invalid coupon code.'
       );
       setAppliedCoupon(null);
@@ -97,11 +97,11 @@ export const Cart: React.FC = () => {
   // Pricing calculations
   const subtotal = totalPrice;
   const discount = appliedCoupon ? appliedCoupon.discountAmount : 0;
-  
+
   // Free shipping over $75, otherwise flat rate of $9.99 (only if there are physical items)
   const hasPhysicalItems = cartItems.some(item => item.productId?.productType === 'physical');
   const shipping = hasPhysicalItems ? (subtotal >= 75 ? 0 : 9.99) : 0;
-  
+
   // Tax rate (8% of subtotal after discount)
   const tax = Math.round((subtotal - discount) * 0.08 * 100) / 100;
   const finalTotal = Math.round((subtotal - discount + shipping + tax) * 100) / 100;
@@ -143,9 +143,9 @@ export const Cart: React.FC = () => {
             if (!product) return null;
 
             return (
-              <div 
-                key={product._id} 
-                className="glass-panel" 
+              <div
+                key={product._id}
+                className="glass-panel"
                 style={{
                   display: 'flex',
                   gap: '1.5rem',
@@ -161,9 +161,9 @@ export const Cart: React.FC = () => {
               >
                 {/* Image */}
                 <div style={{ width: '100px', height: '100px', borderRadius: '12px', overflow: 'hidden', flexShrink: 0 }}>
-                  <img 
-                    src={product.images?.[0]?.url || 'https://via.placeholder.com/100'} 
-                    alt={product.title} 
+                  <img
+                    src={product.images?.[0]?.url || 'https://via.placeholder.com/100'}
+                    alt={product.title}
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                   />
                 </div>
@@ -193,7 +193,7 @@ export const Cart: React.FC = () => {
                     padding: '0.25rem',
                     backgroundColor: 'var(--color-bg-main)'
                   }}>
-                    <button 
+                    <button
                       onClick={() => handleQtyChange(product._id, item.qty, item.qty - 1, product.stock)}
                       disabled={item.qty <= 1 || updatingId === product._id}
                       style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.25rem 0.5rem', color: 'var(--color-primary-dark)' }}
@@ -201,7 +201,7 @@ export const Cart: React.FC = () => {
                       <Minus size={14} />
                     </button>
                     <span style={{ width: '30px', textAlign: 'center', fontWeight: 'bold' }}>{item.qty}</span>
-                    <button 
+                    <button
                       onClick={() => handleQtyChange(product._id, item.qty, item.qty + 1, product.stock)}
                       disabled={item.qty >= product.stock || updatingId === product._id}
                       style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0.25rem 0.5rem', color: 'var(--color-primary-dark)' }}
@@ -237,13 +237,13 @@ export const Cart: React.FC = () => {
               </div>
             );
           })}
-          
+
           {/* Actions panel */}
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1rem' }}>
             <Link to="/shop" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600, color: 'var(--color-primary)' }}>
               ← Continue Shopping
             </Link>
-            <button 
+            <button
               onClick={clearCart}
               style={{ background: 'none', border: 'none', color: 'var(--color-text-muted)', textDecoration: 'underline', cursor: 'pointer', fontWeight: 500 }}
             >
@@ -264,7 +264,7 @@ export const Cart: React.FC = () => {
                 <span style={{ color: 'var(--color-text-muted)' }}>Subtotal</span>
                 <span style={{ fontWeight: 600 }}>${subtotal.toFixed(2)}</span>
               </div>
-              
+
               {discount > 0 && (
                 <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--color-success)' }}>
                   <span>Discount</span>
@@ -312,7 +312,7 @@ export const Cart: React.FC = () => {
                       ({appliedCoupon.discountType === 'percentage' ? `${appliedCoupon.discountValue}%` : `$${appliedCoupon.discountValue}`} off)
                     </span>
                   </div>
-                  <button 
+                  <button
                     onClick={handleRemoveCoupon}
                     style={{ background: 'none', border: 'none', color: 'var(--color-error)', cursor: 'pointer', padding: '0.25rem', display: 'flex' }}
                   >
@@ -329,8 +329,8 @@ export const Cart: React.FC = () => {
                     className="form-input"
                     style={{ padding: '0.5rem 0.75rem', fontSize: '0.85rem' }}
                   />
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     disabled={couponLoading || !couponCode.trim()}
                     className="btn btn-outline"
                     style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}
@@ -354,7 +354,7 @@ export const Cart: React.FC = () => {
             </div>
 
             {/* Checkout Action */}
-            <button 
+            <button
               onClick={() => navigate('/checkout', { state: { coupon: appliedCoupon } })}
               className="btn btn-primary"
               style={{ width: '100%', padding: '1rem', fontSize: '1.05rem', display: 'flex', justifyContent: 'center', gap: '0.5rem' }}
@@ -378,6 +378,69 @@ export const Cart: React.FC = () => {
         @media (max-width: 992px) {
           .grid-3 {
             grid-template-columns: 1fr !important;
+          }
+        }
+
+        /* Enhanced Mobile Responsiveness */
+        @media (max-width: 768px) {
+          .cart-container {
+            padding: 1rem 0.5rem 3rem 0 !important;
+          }
+          
+          .cart-item {
+            padding: 1rem !important;
+            gap: 1rem !important;
+          }
+          
+          .cart-item-image {
+            width: 80px !important;
+            height: 80px !important;
+          }
+          
+          .quantity-controls {
+            width: 100% !important;
+          }
+          
+          .order-summary {
+            padding: 1.5rem !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .cart-container {
+            padding: 1rem 0 3rem 0 !important;
+          }
+          
+          .cart-item {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+          }
+          
+          .cart-item-image {
+            width: 100% !important;
+            height: 150px !important;
+          }
+          
+          .cart-item-details {
+            width: 100% !important;
+          }
+          
+          .quantity-controls {
+            width: 100% !important;
+          }
+          
+          .remove-button {
+            width: 100% !important;
+            margin-top: 0.5rem !important;
+          }
+          
+          .coupon-input {
+            width: 100% !important;
+          }
+          
+          .checkout-button {
+            padding: 0.875rem !important;
+            font-size: 1rem !important;
           }
         }
       `}</style>

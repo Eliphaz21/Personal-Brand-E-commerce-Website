@@ -36,8 +36,8 @@ export const Register: React.FC = () => {
     } catch (err: any) {
       console.error('Registration error:', err);
       setError(
-        err.response?.data?.message || 
-        err.response?.data?.error || 
+        err.response?.data?.message ||
+        err.response?.data?.error ||
         'Failed to register. This email may already be in use.'
       );
     } finally {
@@ -129,10 +129,10 @@ export const Register: React.FC = () => {
             </div>
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={loading}
-            className="btn btn-primary" 
+            className="btn btn-primary"
             style={{ width: '100%', padding: '0.875rem', marginTop: '1rem', display: 'flex', justifyContent: 'center', gap: '0.5rem' }}
           >
             {loading ? (
@@ -163,6 +163,39 @@ export const Register: React.FC = () => {
         }
         @keyframes rotate {
           100% { transform: rotate(360deg); }
+        }
+
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+          .register-container {
+            padding: 1rem 0.5rem !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .register-container {
+            padding: 1rem 0 !important;
+            min-height: calc(100vh - 60px) !important;
+          }
+          
+          .glass-panel {
+            padding: 2rem 1.5rem !important;
+            border-radius: 16px !important;
+          }
+          
+          h1 {
+            font-size: 1.5rem !important;
+          }
+          
+          .form-input {
+            padding: 0.75rem 1rem !important;
+            font-size: 0.9rem !important;
+          }
+          
+          .btn {
+            padding: 0.75rem 1rem !important;
+            font-size: 0.9rem !important;
+          }
         }
       `}</style>
     </div>
