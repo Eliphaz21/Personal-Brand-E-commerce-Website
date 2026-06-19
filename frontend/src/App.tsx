@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import Navbar from './components/Navbar';
@@ -33,52 +34,54 @@ import AdminUsers from './pages/admin/AdminUsers';
 
 function App() {
   return (
-    <AuthProvider>
-      <CartProvider>
-        <Router>
-          <Navbar />
-          <div className="main-content" style={{ marginTop: '80px', minHeight: 'calc(100vh - 80px)' }}>
-            <Routes>
-              {/* Public Routes */}
-              <Route path="/" element={<Home />} />
-              <Route path="/shop" element={<ProductCatalog />} />
-              <Route path="/product/:slug" element={<ProductDetails />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/verify-otp" element={<VerifyOTP />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/about" element={<AboutCompany />} />
-              <Route path="/portfolio" element={<Portfolio />} />
+    <HelmetProvider>
+      <AuthProvider>
+        <CartProvider>
+          <Router>
+            <Navbar />
+            <div className="main-content" style={{ marginTop: '80px', minHeight: 'calc(100vh - 80px)' }}>
+              <Routes>
+                {/* Public Routes */}
+                <Route path="/" element={<Home />} />
+                <Route path="/shop" element={<ProductCatalog />} />
+                <Route path="/product/:slug" element={<ProductDetails />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+                <Route path="/verify-otp" element={<VerifyOTP />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/about" element={<AboutCompany />} />
+                <Route path="/portfolio" element={<Portfolio />} />
 
-              {/* Protected Customer Routes */}
-              <Route element={<ProtectedRoute />}>
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/checkout" element={<Checkout />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/profile/change-password" element={<ChangePassword />} />
-                <Route path="/orders" element={<Orders />} />
-                <Route path="/orders/:id" element={<OrderDetail />} />
-              </Route>
-
-              {/* Protected Admin Routes */}
-              <Route element={<AdminRoute />}>
-                <Route path="/admin" element={<AdminLayout />}>
-                  <Route index element={<AdminOverview />} />
-                  <Route path="products" element={<AdminProducts />} />
-                  <Route path="orders" element={<AdminOrders />} />
-                  <Route path="users" element={<AdminUsers />} />
-                  <Route path="inbox" element={<AdminInbox />} />
+                {/* Protected Customer Routes */}
+                <Route element={<ProtectedRoute />}>
+                  <Route path="/cart" element={<Cart />} />
+                  <Route path="/checkout" element={<Checkout />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/profile/change-password" element={<ChangePassword />} />
+                  <Route path="/orders" element={<Orders />} />
+                  <Route path="/orders/:id" element={<OrderDetail />} />
                 </Route>
-              </Route>
 
-              {/* Fallback Catch-all Route */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </div>
-          <Footer />
-        </Router>
-      </CartProvider>
-    </AuthProvider>
+                {/* Protected Admin Routes */}
+                <Route element={<AdminRoute />}>
+                  <Route path="/admin" element={<AdminLayout />}>
+                    <Route index element={<AdminOverview />} />
+                    <Route path="products" element={<AdminProducts />} />
+                    <Route path="orders" element={<AdminOrders />} />
+                    <Route path="users" element={<AdminUsers />} />
+                    <Route path="inbox" element={<AdminInbox />} />
+                  </Route>
+                </Route>
+
+                {/* Fallback Catch-all Route */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </div>
+            <Footer />
+          </Router>
+        </CartProvider>
+      </AuthProvider>
+    </HelmetProvider>
   );
 }
 
