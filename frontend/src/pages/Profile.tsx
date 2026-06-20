@@ -143,7 +143,7 @@ export const Profile: React.FC = () => {
             flexShrink: 0
           }}>
             {user?.avatar ? (
-              <img src={user.avatar} alt={user.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <img src={typeof user.avatar === 'string' ? user.avatar : user.avatar.url} alt={user.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             ) : (
               <span style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--color-primary-dark)', fontFamily: 'var(--font-heading)' }}>
                 {initials}
