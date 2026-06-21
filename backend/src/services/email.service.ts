@@ -4,11 +4,15 @@ import { env } from '../config/env';
 // Create a reusable transporter using SMTP configuration
 const transporter = nodemailer.createTransport({
   host: env.SMTP_HOST,
-  port: parseInt(env.SMTP_PORT || '587', 10),
-  secure: env.SMTP_PORT === '465', // true for 465, false for other ports (like 587)
+  port: parseInt(env.SMTP_PORT || '465', 10),
+  secure: true, // true for 465 (SSL), false for other ports
   auth: {
     user: env.SMTP_USER,
     pass: env.SMTP_PASS,
+  },
+  tls: {
+    // Do not fail on invalid certs
+    rejectUnauthorized: false,
   },
 });
 
