@@ -71,15 +71,11 @@ export const register = catchAsync(async (req: Request, res: Response): Promise<
     existingUser.otpResendCount = 0;
 
     await existingUser.save();
-
-    // TEMPORARY: Skip email sending for testing
-    // await sendOTPEmail(email, name, otp);
+    await sendOTPEmail(email, name, otp);
 
     res.status(200).json({
       success: true,
       message: 'A new verification code has been sent to your email.',
-      // TEMPORARY: Return OTP for testing
-      otp: otp,
     });
     return;
   }
@@ -99,15 +95,12 @@ export const register = catchAsync(async (req: Request, res: Response): Promise<
     otpExpiry,
   });
 
-  // TEMPORARY: Skip email sending for testing
-  // await sendOTPEmail(email, name, otp);
+  await sendOTPEmail(email, name, otp);
 
   res.status(201).json({
     success: true,
     message: 'Registration successful! Please check your email for the verification code.',
     userId: newUser._id,
-    // TEMPORARY: Return OTP for testing
-    otp: otp,
   });
 });
 

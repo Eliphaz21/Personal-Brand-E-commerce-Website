@@ -1,30 +1,12 @@
-import nodemailer from 'nodemailer';
+import sgMail from '@sendgrid/mail';
 import { env } from '../config/env';
 
-// Create a reusable transporter using SMTP configuration
-const transporter = nodemailer.createTransport({
-  host: env.SMTP_HOST,
-  port: parseInt(env.SMTP_PORT || '465', 10),
-  secure: true, // true for 465 (SSL), false for other ports
-  auth: {
-    user: env.SMTP_USER,
-    pass: env.SMTP_PASS,
-  },
-  tls: {
-    // Do not fail on invalid certs
-    rejectUnauthorized: false,
-  },
-});
-
-// Verify SMTP connection on startup (in development)
-if (env.NODE_ENV === 'development' && env.SMTP_HOST) {
-  transporter.verify((error) => {
-    if (error) {
-      console.error('❌ SMTP Connection Error:', error.message);
-    } else {
-      console.log('📧 SMTP Transporter connected successfully and ready.');
-    }
-  });
+// Initialize SendGrid if API key is available
+if (env.SENDGRID_API_KEY) {
+  sgMail.setApiKey(env.SENDGRID_API_KEY);
+  console.log('📧 SendGrid initialized successfully.');
+} else {
+  console.log('⚠️  SENDGRID_API_KEY not found. Email sending will be disabled.');
 }
 
 /**
@@ -129,6 +111,11 @@ const getHtmlLayout = (content: string): string => `
  * Send an OTP code to verify new user registration.
  */
 export const sendOTPEmail = async (email: string, name: string, otp: string): Promise<void> => {
+  if (!env.SENDGRID_API_KEY) {
+    console.log('⚠️  SendGrid not configured. Skipping email send.');
+    return;
+  }
+
   const content = `
     <h2>Welcome to KidEnDu, ${name}!</h2>
     <p>Thank you for registering. To complete your sign-up, please verify your email address using the one-time verification code below:</p>
@@ -140,18 +127,28 @@ export const sendOTPEmail = async (email: string, name: string, otp: string): Pr
     <p>Warm regards,<br>The KidEnDu Team</p>
   `;
 
-  await transporter.sendMail({
-    from: `"${env.EMAIL_FROM_NAME || 'KidEnDu'}" <${env.EMAIL_FROM}>`,
-    to: email,
-    subject: '🌿 Verify your KidEnDu email address',
-    html: getHtmlLayout(content),
-  });
+  try {
+    await sgMail.send({
+      to: email,
+      from: env.EMAIL_FROM,
+      subject: '🌿 Verify your KidEnDu email address',
+      html: getHtmlLayout(content),
+    });
+  } catch (error) {
+    console.error('❌ SendGrid error:', error);
+    throw error;
+  }
 };
 
 /**
  * Send an OTP code for resetting a forgotten password.
  */
 export const sendPasswordResetEmail = async (email: string, name: string, otp: string): Promise<void> => {
+  if (!env.SENDGRID_API_KEY) {
+    console.log('⚠️  SendGrid not configured. Skipping email send.');
+    return;
+  }
+
   const content = `
     <h2>Password Reset Request</h2>
     <p>Hello ${name},</p>
@@ -164,12 +161,17 @@ export const sendPasswordResetEmail = async (email: string, name: string, otp: s
     <p>Warm regards,<br>The KidEnDu Team</p>
   `;
 
-  await transporter.sendMail({
-    from: `"${env.EMAIL_FROM_NAME || 'KidEnDu'}" <${env.EMAIL_FROM}>`,
-    to: email,
-    subject: '🔒 Reset your KidEnDu password',
-    html: getHtmlLayout(content),
-  });
+  try {
+    await sgMail.send({
+      to: email,
+      from: env.EMAIL_FROM,
+      subject: '🔒 Reset your KidEnDu password',
+      html: getHtmlLayout(content),
+    });
+  } catch (error) {
+    console.error('❌ SendGrid error:', error);
+    throw error;
+  }
 };
 
 /**
@@ -182,6 +184,11 @@ export const sendContactReplyEmail = async (
   replyBody: string,
   originalMessage: string
 ): Promise<void> => {
+  if (!env.SENDGRID_API_KEY) {
+    console.log('⚠️  SendGrid not configured. Skipping email send.');
+    return;
+  }
+
   const content = `
     <h2>Response to your message: "${subject}"</h2>
     <p>Hello ${name},</p>
@@ -200,18 +207,28 @@ export const sendContactReplyEmail = async (
     <p>Warm regards,<br>The KidEnDu Team</p>
   `;
 
-  await transporter.sendMail({
-    from: `"${env.EMAIL_FROM_NAME || 'KidEnDu'}" <${env.EMAIL_FROM}>`,
-    to: email,
-    subject: `Re: ${subject}`,
-    html: getHtmlLayout(content),
-  });
+  try {
+    await sgMail.send({
+      to: email,
+      from: env.EMAIL_FROM,
+      subject: `Re: ${subject}`,
+      html: getHtmlLayout(content),
+    });
+  } catch (error) {
+    console.error('❌ SendGrid error:', error);
+    throw error;
+  }
 };
 
 /**
  * Welcome email after newsletter subscription.
  */
 export const sendNewsletterWelcomeEmail = async (email: string, name: string): Promise<void> => {
+  if (!env.SENDGRID_API_KEY) {
+    console.log('⚠️  SendGrid not configured. Skipping email send.');
+    return;
+  }
+
   const content = `
     <h2>Welcome to the KidEnDu Wellness Digest!</h2>
     <p>Hello ${name},</p>
@@ -221,12 +238,17 @@ export const sendNewsletterWelcomeEmail = async (email: string, name: string): P
     <p>Warm regards,<br>Coach Kidist & The KidEnDu Team</p>
   `;
 
-  await transporter.sendMail({
-    from: `"${env.EMAIL_FROM_NAME || 'KidEnDu'}" <${env.EMAIL_FROM}>`,
-    to: email,
-    subject: '🌿 Welcome to the KidEnDu Hormone Blueprint Digest',
-    html: getHtmlLayout(content),
-  });
+  try {
+    await sgMail.send({
+      to: email,
+      from: env.EMAIL_FROM,
+      subject: '🌿 Welcome to the KidEnDu Hormone Blueprint Digest',
+      html: getHtmlLayout(content),
+    });
+  } catch (error) {
+    console.error('❌ SendGrid error:', error);
+    throw error;
+  }
 };
 
 /**
@@ -237,6 +259,11 @@ export const sendNewsletterMessageConfirmationEmail = async (
   name: string,
   subject: string
 ): Promise<void> => {
+  if (!env.SENDGRID_API_KEY) {
+    console.log('⚠️  SendGrid not configured. Skipping email send.');
+    return;
+  }
+
   const content = `
     <h2>We received your message</h2>
     <p>Hello ${name},</p>
@@ -245,12 +272,17 @@ export const sendNewsletterMessageConfirmationEmail = async (
     <p>Warm regards,<br>The KidEnDu Team</p>
   `;
 
-  await transporter.sendMail({
-    from: `"${env.EMAIL_FROM_NAME || 'KidEnDu'}" <${env.EMAIL_FROM}>`,
-    to: email,
-    subject: '✓ Your message to Coach Kidist was received',
-    html: getHtmlLayout(content),
-  });
+  try {
+    await sgMail.send({
+      to: email,
+      from: env.EMAIL_FROM,
+      subject: '✓ Your message to Coach Kidist was received',
+      html: getHtmlLayout(content),
+    });
+  } catch (error) {
+    console.error('❌ SendGrid error:', error);
+    throw error;
+  }
 };
 
 /**
@@ -262,6 +294,11 @@ export const sendNewsletterBroadcastEmail = async (
   subject: string,
   body: string
 ): Promise<void> => {
+  if (!env.SENDGRID_API_KEY) {
+    console.log('⚠️  SendGrid not configured. Skipping email send.');
+    return;
+  }
+
   const content = `
     <h2>${subject}</h2>
     <p>Hello ${name},</p>
@@ -273,10 +310,15 @@ export const sendNewsletterBroadcastEmail = async (
     <p>Warm regards,<br>Coach Kidist & The KidEnDu Team</p>
   `;
 
-  await transporter.sendMail({
-    from: `"${env.EMAIL_FROM_NAME || 'KidEnDu'}" <${env.EMAIL_FROM}>`,
-    to: email,
-    subject,
-    html: getHtmlLayout(content),
-  });
+  try {
+    await sgMail.send({
+      to: email,
+      from: env.EMAIL_FROM,
+      subject,
+      html: getHtmlLayout(content),
+    });
+  } catch (error) {
+    console.error('❌ SendGrid error:', error);
+    throw error;
+  }
 };
