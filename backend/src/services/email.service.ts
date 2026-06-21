@@ -1,14 +1,7 @@
 import nodemailer from 'nodemailer';
-import { Resend } from 'resend';
 import { env } from '../config/env';
 
-// Initialize Resend if API key is available
-let resend: Resend | null = null;
-if (env.RESEND_API_KEY) {
-  resend = new Resend(env.RESEND_API_KEY);
-}
-
-// Create a reusable transporter using SMTP configuration (fallback)
+// Create a reusable transporter using SMTP configuration
 const transporter = nodemailer.createTransport({
   host: env.SMTP_HOST,
   port: parseInt(env.SMTP_PORT || '587', 10),
@@ -143,33 +136,12 @@ export const sendOTPEmail = async (email: string, name: string, otp: string): Pr
     <p>Warm regards,<br>The KidEnDu Team</p>
   `;
 
-  // Use Resend if available, otherwise fall back to SMTP
-  if (resend) {
-    try {
-      await resend.emails.send({
-        from: env.EMAIL_FROM,
-        to: email,
-        subject: '🌿 Verify your KidEnDu email address',
-        html: getHtmlLayout(content),
-      });
-    } catch (error) {
-      console.error('Resend error, falling back to SMTP:', error);
-      // Fallback to SMTP
-      await transporter.sendMail({
-        from: `"${env.EMAIL_FROM_NAME || 'KidEnDu'}" <${env.EMAIL_FROM}>`,
-        to: email,
-        subject: '🌿 Verify your KidEnDu email address',
-        html: getHtmlLayout(content),
-      });
-    }
-  } else {
-    await transporter.sendMail({
-      from: `"${env.EMAIL_FROM_NAME || 'KidEnDu'}" <${env.EMAIL_FROM}>`,
-      to: email,
-      subject: '🌿 Verify your KidEnDu email address',
-      html: getHtmlLayout(content),
-    });
-  }
+  await transporter.sendMail({
+    from: `"${env.EMAIL_FROM_NAME || 'KidEnDu'}" <${env.EMAIL_FROM}>`,
+    to: email,
+    subject: '🌿 Verify your KidEnDu email address',
+    html: getHtmlLayout(content),
+  });
 };
 
 /**
@@ -188,32 +160,12 @@ export const sendPasswordResetEmail = async (email: string, name: string, otp: s
     <p>Warm regards,<br>The KidEnDu Team</p>
   `;
 
-  // Use Resend if available, otherwise fall back to SMTP
-  if (resend) {
-    try {
-      await resend.emails.send({
-        from: env.EMAIL_FROM,
-        to: email,
-        subject: '🔒 Reset your KidEnDu password',
-        html: getHtmlLayout(content),
-      });
-    } catch (error) {
-      console.error('Resend error, falling back to SMTP:', error);
-      await transporter.sendMail({
-        from: `"${env.EMAIL_FROM_NAME || 'KidEnDu'}" <${env.EMAIL_FROM}>`,
-        to: email,
-        subject: '🔒 Reset your KidEnDu password',
-        html: getHtmlLayout(content),
-      });
-    }
-  } else {
-    await transporter.sendMail({
-      from: `"${env.EMAIL_FROM_NAME || 'KidEnDu'}" <${env.EMAIL_FROM}>`,
-      to: email,
-      subject: '🔒 Reset your KidEnDu password',
-      html: getHtmlLayout(content),
-    });
-  }
+  await transporter.sendMail({
+    from: `"${env.EMAIL_FROM_NAME || 'KidEnDu'}" <${env.EMAIL_FROM}>`,
+    to: email,
+    subject: '🔒 Reset your KidEnDu password',
+    html: getHtmlLayout(content),
+  });
 };
 
 /**
@@ -244,32 +196,12 @@ export const sendContactReplyEmail = async (
     <p>Warm regards,<br>The KidEnDu Team</p>
   `;
 
-  // Use Resend if available, otherwise fall back to SMTP
-  if (resend) {
-    try {
-      await resend.emails.send({
-        from: env.EMAIL_FROM,
-        to: email,
-        subject: `Re: ${subject}`,
-        html: getHtmlLayout(content),
-      });
-    } catch (error) {
-      console.error('Resend error, falling back to SMTP:', error);
-      await transporter.sendMail({
-        from: `"${env.EMAIL_FROM_NAME || 'KidEnDu'}" <${env.EMAIL_FROM}>`,
-        to: email,
-        subject: `Re: ${subject}`,
-        html: getHtmlLayout(content),
-      });
-    }
-  } else {
-    await transporter.sendMail({
-      from: `"${env.EMAIL_FROM_NAME || 'KidEnDu'}" <${env.EMAIL_FROM}>`,
-      to: email,
-      subject: `Re: ${subject}`,
-      html: getHtmlLayout(content),
-    });
-  }
+  await transporter.sendMail({
+    from: `"${env.EMAIL_FROM_NAME || 'KidEnDu'}" <${env.EMAIL_FROM}>`,
+    to: email,
+    subject: `Re: ${subject}`,
+    html: getHtmlLayout(content),
+  });
 };
 
 /**
@@ -285,32 +217,12 @@ export const sendNewsletterWelcomeEmail = async (email: string, name: string): P
     <p>Warm regards,<br>Coach Kidist & The KidEnDu Team</p>
   `;
 
-  // Use Resend if available, otherwise fall back to SMTP
-  if (resend) {
-    try {
-      await resend.emails.send({
-        from: env.EMAIL_FROM,
-        to: email,
-        subject: '🌿 Welcome to the KidEnDu Hormone Blueprint Digest',
-        html: getHtmlLayout(content),
-      });
-    } catch (error) {
-      console.error('Resend error, falling back to SMTP:', error);
-      await transporter.sendMail({
-        from: `"${env.EMAIL_FROM_NAME || 'KidEnDu'}" <${env.EMAIL_FROM}>`,
-        to: email,
-        subject: '🌿 Welcome to the KidEnDu Hormone Blueprint Digest',
-        html: getHtmlLayout(content),
-      });
-    }
-  } else {
-    await transporter.sendMail({
-      from: `"${env.EMAIL_FROM_NAME || 'KidEnDu'}" <${env.EMAIL_FROM}>`,
-      to: email,
-      subject: '🌿 Welcome to the KidEnDu Hormone Blueprint Digest',
-      html: getHtmlLayout(content),
-    });
-  }
+  await transporter.sendMail({
+    from: `"${env.EMAIL_FROM_NAME || 'KidEnDu'}" <${env.EMAIL_FROM}>`,
+    to: email,
+    subject: '🌿 Welcome to the KidEnDu Hormone Blueprint Digest',
+    html: getHtmlLayout(content),
+  });
 };
 
 /**
@@ -329,32 +241,12 @@ export const sendNewsletterMessageConfirmationEmail = async (
     <p>Warm regards,<br>The KidEnDu Team</p>
   `;
 
-  // Use Resend if available, otherwise fall back to SMTP
-  if (resend) {
-    try {
-      await resend.emails.send({
-        from: env.EMAIL_FROM,
-        to: email,
-        subject: '✓ Your message to Coach Kidist was received',
-        html: getHtmlLayout(content),
-      });
-    } catch (error) {
-      console.error('Resend error, falling back to SMTP:', error);
-      await transporter.sendMail({
-        from: `"${env.EMAIL_FROM_NAME || 'KidEnDu'}" <${env.EMAIL_FROM}>`,
-        to: email,
-        subject: '✓ Your message to Coach Kidist was received',
-        html: getHtmlLayout(content),
-      });
-    }
-  } else {
-    await transporter.sendMail({
-      from: `"${env.EMAIL_FROM_NAME || 'KidEnDu'}" <${env.EMAIL_FROM}>`,
-      to: email,
-      subject: '✓ Your message to Coach Kidist was received',
-      html: getHtmlLayout(content),
-    });
-  }
+  await transporter.sendMail({
+    from: `"${env.EMAIL_FROM_NAME || 'KidEnDu'}" <${env.EMAIL_FROM}>`,
+    to: email,
+    subject: '✓ Your message to Coach Kidist was received',
+    html: getHtmlLayout(content),
+  });
 };
 
 /**
@@ -377,30 +269,10 @@ export const sendNewsletterBroadcastEmail = async (
     <p>Warm regards,<br>Coach Kidist & The KidEnDu Team</p>
   `;
 
-  // Use Resend if available, otherwise fall back to SMTP
-  if (resend) {
-    try {
-      await resend.emails.send({
-        from: env.EMAIL_FROM,
-        to: email,
-        subject,
-        html: getHtmlLayout(content),
-      });
-    } catch (error) {
-      console.error('Resend error, falling back to SMTP:', error);
-      await transporter.sendMail({
-        from: `"${env.EMAIL_FROM_NAME || 'KidEnDu'}" <${env.EMAIL_FROM}>`,
-        to: email,
-        subject,
-        html: getHtmlLayout(content),
-      });
-    }
-  } else {
-    await transporter.sendMail({
-      from: `"${env.EMAIL_FROM_NAME || 'KidEnDu'}" <${env.EMAIL_FROM}>`,
-      to: email,
-      subject,
-      html: getHtmlLayout(content),
-    });
-  }
+  await transporter.sendMail({
+    from: `"${env.EMAIL_FROM_NAME || 'KidEnDu'}" <${env.EMAIL_FROM}>`,
+    to: email,
+    subject,
+    html: getHtmlLayout(content),
+  });
 };
