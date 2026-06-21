@@ -29,6 +29,9 @@ import analyticsRoutes from './routes/analytics.routes';
 
 const app: Application = express();
 
+// Trust proxy for Render/Cloudflare
+app.set('trust proxy', true);
+
 // ─── Security Middleware ──────────────────────────────────────────────────────
 app.use(
   helmet({
