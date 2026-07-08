@@ -111,6 +111,10 @@ const getHtmlLayout = (content: string): string => `
  * Send an OTP code to verify new user registration.
  */
 export const sendOTPEmail = async (email: string, name: string, otp: string): Promise<void> => {
+  // TEMPORARY: Skip email sending due to SendGrid account verification issues
+  console.log(`📧 [DEV MODE] OTP for ${email}: ${otp}`);
+  return;
+
   if (!env.SENDGRID_API_KEY) {
     console.log('⚠️  SendGrid not configured. Skipping email send.');
     return;
